@@ -116,6 +116,9 @@
 		      :height 100
 		      :weight 'normal))
 
+;; With this enabled on Carbon Emacs useless things happen, for example C-h hides the Emacs window
+(setq mac-pass-command-to-system nil)
+
 ;; * ------------------
 ;; * Editing (general)
 ;; * ------------------
@@ -236,10 +239,11 @@
   (setq global-semantic-tag-folding-mode t))
 
 ;;(semantic-add-system-include stl_include 'c++-mode)
-;;(global-semantic-idle-local-symbol-highlight-mode)
+(global-semantic-idle-local-symbol-highlight-mode)
 (global-semantic-idle-completions-mode 1)
 (global-semantic-highlight-func-mode 1)
 (global-semantic-idle-summary-mode t)
+;;(semantic-load-enable-gaudy-code-helpers)
 
 ;; JDEE: never got this to work
 ;; (add-to-list 'load-path (my-load-path "jdee-2.4.0.1/lisp"))
@@ -297,12 +301,15 @@
 	  (lambda ()
 	    "Treat Java 1.5 @-style annotations as comments."
 	    (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
-	    (modify-syntax-entry ?@ "< b" java-mode-syntax-table)
-	    (set-key "TAB" (self-insert "	"))))
+	    (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
 
 ;; (add-hook 'java-mode-hook
 ;;           '(lambda ()
 ;;              (semantic-add-system-include "/usr/lib/jvm/java-6-openjdk" 'java-mode)))
+
+(add-hook 'java-mode-hook
+  '(lambda ()
+     (semantic-add-system-include "/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home" 'java-mode)))
 
 ;; Python
 (setenv "PYTHONPATH" "~/dev/python")
