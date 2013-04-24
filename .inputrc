@@ -7,3 +7,4 @@
 "\C-\b": backward-kill-word
 
 set blink-matching-paren on
+set completion-ignore-case on

@@ -109,12 +109,14 @@
 (display-battery-mode t)
 (column-number-mode t)
 
-;; Sensible font for Mac
+;; Things that make life on a Mac better
 (when (eq system-type 'darwin)
-  (set-face-attribute 'default nil
+  (set-face-attribute 'default nil      ; Sensible font
 		      :family "Menlo"
 		      :height 100
-		      :weight 'normal))
+		      :weight 'normal)
+  (setq mac-command-modifier 'control)  ; Carbon Emacs seems to swap command and control, which would usually be welcome
+  (setq mac-control-modifier 'meta))    ; except I already swap these keys system-wide on a mac, so they need swapping again for Emacs!
 
 ;; With this enabled on Carbon Emacs useless things happen, for example C-h hides the Emacs window
 (setq mac-pass-command-to-system nil)
@@ -211,7 +213,11 @@
 ;; n.b. Common Lisp (SLIME) and Haskell modes have their own documentation features
 
 ;; Semantic / cedet
-(semantic-mode t)
+
+;; Only when running from source!
+;; (load-file (my-load-path "cedet-1.1/common/cedet.el"))
+;; (semantic-load-enable-excessive-code-helpers)
+;; #####
 
 (defun custom-cedet-hook ()
   (local-set-key [(control return)] 'semantic-ia-complete-symbol)
@@ -243,7 +249,6 @@
 (global-semantic-idle-completions-mode 1)
 (global-semantic-highlight-func-mode 1)
 (global-semantic-idle-summary-mode t)
-;;(semantic-load-enable-gaudy-code-helpers)
 
 ;; JDEE: never got this to work
 ;; (add-to-list 'load-path (my-load-path "jdee-2.4.0.1/lisp"))
@@ -263,6 +268,7 @@
 (load "haskell-mode/haskell-site-file")
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+(setq haskell-program-name "ghci")
 
 ;; Standard ML mode
 (autoload 'sml-mode "sml-mode-4.1/sml-mode-startup.el" "Major mode for standard ML" t)
