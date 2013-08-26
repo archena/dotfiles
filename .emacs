@@ -63,6 +63,9 @@
 (global-set-key "\M-s\M-o" 'multi-occur-in-this-mode)
 (global-set-key "\M-sd" 'show-defuns)
 
+;; Scroll lock
+(global-set-key (kbd "<Scroll_Lock>") 'scroll-lock-mode)
+
 ;; Don't want C-z to minimise when in a windowing system
 (when window-system
   (global-set-key "\C-z" nil)
@@ -164,7 +167,7 @@
 
 ;; Colour theme
 (require 'color-theme-tomorrow)
-(color-theme-tomorrow--define-theme night)
+(color-theme-tomorrow--define-theme day)
 
 ;; * ------------------
 ;; * Programming and text
@@ -280,9 +283,14 @@
 
 ;; Haskell mode
 ;; n.b. haskell-site-file contains all the necessary autoloads
-(load "haskell-mode/haskell-site-file")
+(add-to-list 'load-path (my-load-path "haskell-mode"))
+(require 'haskell-mode-autoloads)
+(add-to-list 'Info-default-directory-list "~/emacs/haskell-mode/")
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+(define-key haskell-mode-map (kbd "C-c <") 'haskell-move-nested-left)
+(define-key haskell-mode-map (kbd "C-c >") 'haskell-move-nested-right)
+
+
 (setq haskell-program-name "ghci")
 
 ;; Standard ML mode
