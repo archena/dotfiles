@@ -1,4 +1,4 @@
-;; Archena's .emacs config file. Started 17:44 on 10/05/2009.
+;; Archena's .emacs config file. Started 17:44 on 10/05/2009
 ;;
 ;; Much of this file depends on external emacs packages which would need to obtained separately.
 ;; For this reason, don't simply copy this file to ~/.emacs and expect it to work!
@@ -10,7 +10,7 @@
 ;; ---------------
 ;; 1) User information
 ;; 2) Keybindings
-;; 3) User interface
+;; 3) User interface / system
 ;; 4) Editing (general)
 ;; 5) Programming and text
 ;; 6) Org-mode and remember-mode
@@ -37,11 +37,12 @@
 
 ;; Programming keybindings
 (global-set-key [f1] 'man)
-(global-set-key [f9] 'compile)
+(global-set-key [f6] 'mu4e)
 (global-set-key [f8] 'gdb)
+(global-set-key [f9] 'compile)
 
-;; Buffer keybindings
-(global-set-key "\C-x\C-b" 'buffer-menu)            ; C-xC-b opens buffer menu in current window instead of a new one
+;; Replace buffer-menu with ibuffer
+(global-set-key "\C-x\C-b" 'ibuffer)
 
 ;; Left, right, up, down window movement
 ;; n.b. These don't play nicely with org mode!
@@ -66,17 +67,28 @@
 ;; Scroll lock
 (global-set-key (kbd "<Scroll_Lock>") 'scroll-lock-mode)
 
+;; Commenting
+(global-set-key "\C-c\C-c" 'comment-or-uncomment-region)
+
 ;; Don't want C-z to minimise when in a windowing system
 (when window-system
   (global-set-key "\C-z" nil)
   (global-set-key "\C-xz" nil))
 
 ;; * ----------------
-;; * User interface
+;; * User interface / system
 ;; * ----------------
 
 ;; Run as server
 (server-start)
+
+;; Socks
+(defun connect-socks ()
+  (interactive)                         
+  (setq socks-override-functions 1)
+  (setq socks-noproxy '("localhost"))
+  (require 'socks)
+  (setq socks-server (list "Socks server" "localhost" 10010 5)))
 
 ;; Scroll one line only at the bottom of a window
 (setq scroll-step 1)
@@ -103,6 +115,9 @@
 ;; ido-mode
 (ido-mode t)
 
+;; uniquify
+(require 'uniquify)
+
 ;; GUI
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -113,7 +128,7 @@
 (display-battery-mode t)
 (column-number-mode t)
 
-;; Things that make life on a Mac better
+;; Things that make life on a Mac better (for when there's no other choice)
 (when (eq system-type 'darwin)
   (set-face-attribute 'default nil      ; Sensible font
 		      :family "Menlo"
@@ -122,7 +137,7 @@
   (setq mac-command-modifier 'control)  ; Carbon Emacs seems to swap command and control, which would usually be welcome
   (setq mac-control-modifier 'meta)     ; except I already swap these keys system-wide on a Mac, so they need swapping again for Emacs!
   (setq mouse-wheel-mode nil)
-  ;(defun mac-mwheel-scroll () ())       ; Brute-force way to disable mouse scrolling (the Mac mouse is to sensitive)
+  ;(defun mac-mwheel-scroll () ())       ; Brute-force way to disable mouse scrolling (the Mac mouse is too sensitive)
   ;(defun mwheel-scroll () ()))
   (setq mac-pass-command-to-system nil) ; On Carbon Emacs useless things happen with this enabled, like C-h hiding the window
 )
@@ -132,7 +147,7 @@
 ;; * ------------------
 
 ;; Additonal auto-mode regexes
-(setq auto-mode-alist (append '(("\\.m$"                  . objc-mode)
+(setq auto-mode-alist (append '(("\\.m$"                  . octave-mode)
                                 ("\\.ldf$"                . latex-mode)
                                 ("\\.js$"                 . javascript-mode)
                                 ("\\.s\\(ml\\|ig\\)\\'"   . sml-mode)
@@ -152,7 +167,7 @@
                               auto-mode-alist))
 
 ;; Indentation
-(setq tab-width 8)
+(setq tab-width 4)
 (setq-default indent-tabs-mode nil)
 
 ;; Marking
@@ -167,7 +182,7 @@
 
 ;; Colour theme
 (require 'color-theme-tomorrow)
-(color-theme-tomorrow--define-theme day)
+(color-theme-tomorrow--define-theme night)
 
 ;; * ------------------
 ;; * Programming and text
@@ -177,9 +192,9 @@
 (show-paren-mode t)
 
 ;; Multiple cursors
-(add-to-list 'load-path (my-load-path "multiple-cursors"))
-(require 'multiple-cursors)
-(global-set-key (kbd "C-x r e") 'mc/edit-lines)
+;; (add-to-list 'load-path (my-load-path "multiple-cursors"))
+;; (require 'multiple-cursors)
+;; (global-set-key (kbd "C-x r e") 'mc/edit-lines)
 
 ;; Mode-specific scratch buffers
 (load "scratch-modes.el")
@@ -190,6 +205,15 @@
 
 ;;(load "auto-indent-mode")
 ;;(auto-indent-global-mode)
+
+;; Expand region
+(add-to-list 'load-path (my-load-path "expand-region"))
+(require 'expand-region)
+(global-set-key (kbd "C-=") 'er/expand-region)
+
+;; Magit
+(add-to-list 'load-path (my-load-path "magit"))
+;;(require 'magit)
 
 ;; Which function mode
 (which-function-mode t)
@@ -224,7 +248,6 @@
 ;; n.b. Common Lisp (SLIME) and Haskell modes have their own documentation features
 
 ;; Semantic / cedet (from bzr source)
-;;(load-file (my-load-path "gv.el"))
 (load-file (my-load-path "cedet-bzr/cedet-devel-load.el"))
 
 (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
@@ -255,6 +278,7 @@
 (add-hook 'c-mode-common-hook 'custom-cedet-hook)
 (add-hook 'java-mode-hook 'custom-cedet-hook)
 (add-hook 'lisp-mode-hook 'custom-cedet-hook)
+(add-hook 'lisp-interaction-mode-hook 'custom-cedet-hook)
 (add-hook 'scheme-mode-hook 'custom-cedet-hook)
 (add-hook 'emacs-lisp-mode-hook 'custom-cedet-hook)
 (add-hook 'python-mode-hook 'custom-cedet-hook)
@@ -265,13 +289,10 @@
  (local-set-key ">" 'semantic-complete-self-insert))
 (add-hook 'c-mode-common-hook 'c-mode-cedet-hook)
 
-;; (when window-system
-;;   (setq global-semantic-tag-folding-mode t))
-
-;; JDEE: never got this to work
-;; (add-to-list 'load-path (my-load-path "jdee/trunk/jdee/lisp"))
-;; (require 'jde)
-;; (jde-db-set-source-paths "/usr/lib/jvm/java-6-openjdk")
+;; ;; JDEE: never got this to work
+;; ;; (add-to-list 'load-path (my-load-path "jdee/trunk/jdee/lisp"))
+;; ;; (require 'jde)
+;; ;; (jde-db-set-source-paths "/usr/lib/jvm/java-6-openjdk")
 
 ;; Yasnippet
 (require 'yasnippet-bundle)
@@ -281,27 +302,35 @@
 ;; Scheme
 (setq scheme-program-name "guile")
 
+;; SLIME Lisp environment
+(setq inferior-lisp-program "sbcl")
+(require 'slime-autoloads)
+(slime-setup)
+
 ;; Haskell mode
 ;; n.b. haskell-site-file contains all the necessary autoloads
 (add-to-list 'load-path (my-load-path "haskell-mode"))
 (require 'haskell-mode-autoloads)
 (add-to-list 'Info-default-directory-list "~/emacs/haskell-mode/")
-(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 (define-key haskell-mode-map (kbd "C-c <") 'haskell-move-nested-left)
 (define-key haskell-mode-map (kbd "C-c >") 'haskell-move-nested-right)
 
+(defun haskell-custom-hook ()
+  (turn-on-haskell-doc-mode)
+  (turn-on-haskell-indentation))
+(add-hook 'haskell-mode-hook 'haskell-custom-hook)
 
 (setq haskell-program-name "ghci")
+
+;; Idris mode
+(add-to-list 'load-path (my-load-path "idris-mode"))
+(require 'idris-mode)
+(defalias 'run-idris 'idris-run)
 
 ;; Standard ML mode
 (autoload 'sml-mode "sml-mode-4.1/sml-mode-startup.el" "Major mode for standard ML" t)
 (autoload 'run-sml "sml-mode-4.1/sml-mode-startup.el" "Run ML REPL" t)
 (setq sml-program-name "mosml")
-
-;; FSharp mode
-(add-to-list 'load-path (my-load-path "fsharp-mode"))
-(autoload 'fsharp-mode "fsharp" "Major mode for editing F# code." t)
-(autoload 'run-fsharp "inf-fsharp" "Run an inferior F# process." t)
 
 ;; Scala
 (add-to-list 'load-path (my-load-path "scala-mode2"))
@@ -361,11 +390,16 @@
   (flymake-mode -1))
 (add-hook  'csharp-mode-hook 'csharp-custom-hook t)
 
+;; FSharp mode
+(add-to-list 'load-path (my-load-path "fsharp-mode"))
+(autoload 'fsharp-mode "fsharp" "Major mode for editing F# code." t)
+(autoload 'run-fsharp "inf-fsharp" "Run an inferior F# process." t)
+
 ;; PHP
 (autoload 'php-mode "php-mode.el" "Major mode for PHP" t)
 
 ;; LaTeX
-(setq tex-dvi-view-command "evince *.pdf")
+(setq tex-dvi-view-command "atril *.pdf")
 (setq latex-run-command "pdflatex")
 
 ;; Yaml
@@ -389,16 +423,46 @@
 ;; Arduino mode
 (autoload 'arduino-mode "arduino-mode" nil t)
 
+;; Lambda calculus interpreter
+(require 'lambdacalc)
+
+;; MongoDB
+(add-to-list 'load-path (my-load-path "inf-mongo"))
+(require 'inf-mongo)
+(defalias 'mongo 'inf-mongo)
+(setq inf-mongo-command "/usr/bin/mongo 127.0.0.1:27017")
+
 ;; Generic mode
 ;; n.b. to force Windows modes on: (setq generic-define-mswindows-modes t) before loading generic
 ;;(require 'generic-x)
+
+;; Smart scan
+(require 'smartscan)
+(global-smartscan-mode)
+
+(load "pamrel.el")
 
 ;; * ------------------
 ;; * Org-mode and remember-mode
 ;; * ------------------
 
 ;; Org-mode
+(setq org-directory "~/docs/org/")
+(setq org-agenda-files '("~/docs/org/tasks.org"
+                         "~/docs/org/projects.org"
+                         "~/docs/org/business.org"
+                         "~/docs/org/research.org"
+                         "~/docs/org/work.org"))
 (define-key global-map "\C-ca" 'org-agenda)
+
+(setq remember-annotation-functions '(org-remember-annotation))
+(setq remember-handler-functions '(org-remember-handler))
+(add-hook 'remember-mode-hook 'org-remember-apply-template)
+(define-key global-map "\C-cr" 'org-remember)
+
+(setq org-remember-templates '(("Contact" ?c "** TODO Contact %^{Name} regarding %^{Regarding} :contact:\n" "~/docs/org/tasks.org" "Contact")
+                               ("Appointment" ?a "** TODO %^{Name} at %^{Location} %^{Time} :appointment:\n" "~/docs/org/tasks.org" "Appointments")
+                               ("Remember" ?r "** TODO %^{Thing}\n" "~/docs/org/tasks.org" "Remember tasks")))
 
 (setq org-tags-match-list-sublevels t)
 (setq org-enforce-todo-dependencies t)
@@ -407,15 +471,10 @@
 ;; * Mail and IM
 ;; * ----------------
 
-(add-to-list 'load-path (my-load-path "vm-7.19"))
-
-(autoload 'vm "vm" "Start VM on your primary inbox." t)
-(autoload 'vm-other-frame "vm" "Like `vm' but starts in another frame." t)
-(autoload 'vm-visit-folder "vm" "Start VM on an arbitrary folder." t)
-(autoload 'vm-visit-virtual-folder "vm" "Visit a VM virtual folder." t)
-(autoload 'vm-mode "vm" "Run VM major mode on a buffer" t)
-(autoload 'vm-mail "vm" "Send a mail message using VM." t)
-(autoload 'vm-submit-bug-report "vm" "Send a bug report about VM." t)
+(add-to-list 'load-path (my-load-path "mu4e"))
+(require 'mu4e)
+(defalias 'mu 'mu4e)
+(load "email.el")
 
 ;; * ----------------
 ;; * Themes
@@ -507,7 +566,7 @@
 ;; Count words in buffer
 (defun count-words ()
   (interactive)
-  (message (count-matches "[a-zA-Z\-\']+")))
+  (message "%s" (count-matches "[a-zA-Z\-\']+")))
 
 ;; Swap two windows (from Steve Yegge)
 (defun swap-windows ()
