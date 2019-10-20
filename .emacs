@@ -11,16 +11,21 @@
 (require 'package)
 
 (setq my-packages
-      '(magit
+      '(color-theme-sanityinc-tomorrow
+        magit
+;;        exec-path-from-shell
+        ;; Programming tooling
 	    slime
 	    markdown-mode
 	    yaml-mode
 	    json-mode
         go-mode
         terraform-mode
-	    color-theme-sanityinc-tomorrow))
+        ;; Data science tooling
+        jupyter
+        ))
 
-(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
 (package-initialize)
 
@@ -121,9 +126,37 @@
 
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
-
 (auto-compression-mode t)
 (show-paren-mode t)
+
+;; Go
+;; This needs to be accompanied with some Go tooling installation:
+;; - Emacs packages: go-mode, go-autocomplete, golint
+;; - Go packages:
+;;    go get golang.org/x/tools/cmd/...
+;;    go get github.com/rogpeppe/godef
+;;    go get -u github.com/nsf/gocode
+;;    go get golang.org/x/tools/cmd/goimports
+;;    go get -u golang.org/x/lint/golint
+
+(defun my-go-mode-hook ()
+  (require 'golint)
+  ; Use goimports instead of go-fmt
+  (setq gofmt-command "goimports")
+
+  (add-hook 'before-save-hook 'gofmt-before-save)
+  (if (not (string-match "go" compile-command))
+      (set (make-local-variable 'compile-command)
+           "go build -v && go test -v && go vet"))
+  (local-set-key (kbd "M-.") 'godef-jump)
+  (local-set-key (kbd "M-*") 'pop-tag-mark))
+(add-hook 'go-mode-hook 'my-go-mode-hook)
+
+(with-eval-after-load 'go-mode
+   (require 'go-autocomplete))
+(defun auto-complete-for-go ()
+  (auto-complete-mode 1))
+(add-hook 'go-mode-hook 'auto-complete-for-go)
 
 ;; cc-mode
 (require 'cc-mode)
@@ -159,16 +192,6 @@
 
 ;(setq haskell-program-name "ghci")
 
-;; Idris mode
-;(add-to-list 'load-path (my-load-path "idris-mode"))
-;(require 'idris-mode)
-;(defalias 'run-idris 'idris-run)
-
-;; Standard ML mode
-;(autoload 'sml-mode "sml-mode-4.1/sml-mode-startup.el" "Major mode for standard ML" t)
-;(autoload 'run-sml "sml-mode-4.1/sml-mode-startup.el" "Run ML REPL" t)
-;(setq sml-program-name "mosml")
-
 ;; Scala
 ;(add-to-list 'load-path (my-load-path "scala-mode2"))
 ;(require 'scala-mode2)
@@ -185,12 +208,6 @@
 ;(require 'ensime)
 ;(add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
 
-;; J-mode
-;(autoload 'j-mode "j-mode.el" "Major mode for J" t)
-;(autoload 'j-shell "j-mode.el" "Run J interpreter" t)
-;(setq j-path "~/src/jgplsrc/j/bin")
-;(defalias 'run-j 'j-shell)
-
 ;; Prolog
 (setq prolog-program "gprolog")
 
@@ -201,18 +218,12 @@
         (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
         (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
 
-;; JSON
-(defun format-json ()
-  ;; From http://stackoverflow.com/questions/435847/emacs-mode-to-edit-json/7934783#7934783
-  (interactive)
-  (let ((b (if mark-active (min (point) (mark)) (point-min)))
-        (e (if mark-active (max (point) (mark)) (point-max))))
-    (shell-command-on-region b e
-     "python -mjson.tool" (current-buffer) t)))
-
 ;; LaTeX
 (setq tex-dvi-view-command "atril *.pdf")
 (setq latex-run-command "pdflatex")
+
+;; CSS
+(setq css-indent-offset 2)
 
 ;; * ------------------
 ;; * Org-mode and remember-mode
@@ -330,12 +341,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes (quote (sanityinc-tomorrow-day)))
- '(custom-safe-themes
-   (quote
-    ("bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" default)))
  '(package-selected-packages
    (quote
-    (terraform-mode go-mode slime color-theme-sanityinc-tomorrow "slime" "magit" magit))))
+    (golint go-autocomplete scala-mode dockerfile-mode exec-path-from-shell ein jupyter yaml-mode websocket terraform-mode slime request oauth2 markdown-mode magit json-mode go-mode emojify color-theme-sanityinc-tomorrow circe alert))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
