@@ -21,6 +21,7 @@
 	    json-mode
         go-mode
         terraform-mode
+        jedi
         ;; Data science tooling
         jupyter
         ))
@@ -56,12 +57,12 @@
 (column-number-mode t)
 (ido-mode t)
 (transient-mark-mode -1)
-(global-hl-line-mode t)
-(set-face-background 'hl-line "#f2f7f2")
+;(global-hl-line-mode t)
+;(set-face-background 'hl-line "#f2f7f2")
 (require 'uniquify) ; Uniquify gives buffers sensible unique names
 
 (setq custom-safe-themes t)
-(color-theme-sanityinc-tomorrow-day)
+(color-theme-sanityinc-tomorrow-night)
 
 ;; Things that make life on a Mac better (for when there's no other choice)
 (when (eq system-type 'darwin)
@@ -93,6 +94,17 @@
 (when window-system
   (global-set-key "\C-z" nil)
   (global-set-key "\C-xz" nil))
+
+;; PYIM Chinese input
+
+(require 'pyim)
+(require 'pyim-basedict)
+(pyim-basedict-enable)
+(setq default-input-method "pyim")
+
+;; Web browsing
+
+(setq browse-url-browser-function 'eww-browse-url)
 
 ;; * ----------------
 ;; * Networking
@@ -128,6 +140,11 @@
 (setq-default indent-tabs-mode nil)
 (auto-compression-mode t)
 (show-paren-mode t)
+
+;; Python
+
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t)
 
 ;; Go
 ;; This needs to be accompanied with some Go tooling installation:
@@ -340,10 +357,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes (quote (sanityinc-tomorrow-day)))
+ '(custom-enabled-themes (quote (sanityinc-tomorrow-night)))
  '(package-selected-packages
    (quote
-    (golint go-autocomplete scala-mode dockerfile-mode exec-path-from-shell ein jupyter yaml-mode websocket terraform-mode slime request oauth2 markdown-mode magit json-mode go-mode emojify color-theme-sanityinc-tomorrow circe alert))))
+    (dash-functional org-trello jedi pomodoro xr pyim pinyin coffee-mode elpy golint go-autocomplete scala-mode dockerfile-mode exec-path-from-shell ein jupyter yaml-mode websocket terraform-mode slime request oauth2 markdown-mode magit json-mode go-mode emojify color-theme-sanityinc-tomorrow circe alert))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
