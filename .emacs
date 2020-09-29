@@ -248,11 +248,7 @@
 
 ;; Org-mode
 (setq org-directory "~/docs/org/")
-(setq org-agenda-files '("~/docs/org/tasks.org"
-                         "~/docs/org/projects.org"
-                         "~/docs/org/business.org"
-                         "~/docs/org/research.org"
-                         "~/docs/org/work.org"))
+(setq org-agenda-files '("~/docs/org/tasks.org"))
 (define-key global-map "\C-ca" 'org-agenda)
 
 (setq remember-annotation-functions '(org-remember-annotation))
@@ -360,7 +356,7 @@
  '(custom-enabled-themes (quote (sanityinc-tomorrow-night)))
  '(package-selected-packages
    (quote
-    (dash-functional org-trello jedi pomodoro xr pyim pinyin coffee-mode elpy golint go-autocomplete scala-mode dockerfile-mode exec-path-from-shell ein jupyter yaml-mode websocket terraform-mode slime request oauth2 markdown-mode magit json-mode go-mode emojify color-theme-sanityinc-tomorrow circe alert))))
+    (processing-mode flycheck dash-functional org-trello jedi pomodoro xr pyim pinyin coffee-mode elpy golint go-autocomplete scala-mode dockerfile-mode exec-path-from-shell ein jupyter yaml-mode websocket terraform-mode slime request oauth2 markdown-mode magit json-mode go-mode emojify color-theme-sanityinc-tomorrow circe alert))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
