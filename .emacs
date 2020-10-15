@@ -77,7 +77,7 @@
 
 ;; Keybindings
 (global-set-key [f1] 'man)
-(global-set-key [f6] 'mu4e)
+;;(global-set-key [f6] 'mu4e)
 (global-set-key [f8] 'gdb)
 (global-set-key [f9] 'compile)
 (global-set-key "\C-x\C-b" 'ibuffer)
