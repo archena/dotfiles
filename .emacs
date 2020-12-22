@@ -13,7 +13,7 @@
 (setq my-packages
       '(color-theme-sanityinc-tomorrow
         magit
-;;        exec-path-from-shell
+        ;;        exec-path-from-shell
         ;; Programming tooling
 	    slime
 	    markdown-mode
@@ -57,8 +57,8 @@
 (column-number-mode t)
 (ido-mode t)
 (transient-mark-mode -1)
-;(global-hl-line-mode t)
-;(set-face-background 'hl-line "#f2f7f2")
+(global-hl-line-mode t)
+;(set-face-background 'hl-line "#333")
 (require 'uniquify) ; Uniquify gives buffers sensible unique names
 
 (setq custom-safe-themes t)
