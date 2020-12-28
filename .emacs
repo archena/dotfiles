@@ -1,44 +1,61 @@
 ;; Archena's .emacs config file
 ;; - started 17:44 on 10/05/2009
 ;; - mostly re-written 20:33 on 30/05/2019
+;; - another re-work on 19:41 28/12/20
 ;;
 ;; http://www.github.com/archena
+
+;; Enable Emacs server
+(server-start)
 
 ;; * ----------------
 ;; * Packages
 ;; * ----------------
+;;
+;; All the packages that I regularly use are added here so that they can be immediately
+;; re-installed if I open Emacs on a new computer, OS install, etc.
 
 (require 'package)
 
-(setq my-packages
-      '(color-theme-sanityinc-tomorrow
-        magit
-        ;;        exec-path-from-shell
-        ;; Programming tooling
-	    slime
-	    markdown-mode
-	    yaml-mode
-	    json-mode
-        go-mode
-        terraform-mode
-        jedi
-        ;; Data science tooling
-        jupyter
-        ))
-
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("melpa-stable" . "https://stable.melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (package-initialize)
 
 (unless package-archive-contents
   (package-refresh-contents))
 
+(setq my-packages
+      '(color-theme-sanityinc-tomorrow
+        ;;use-package
+        magit
+        pyim
+        ;; Programming tooling
+	    slime
+	    markdown-mode
+	    yaml-mode
+	    json-mode
+        go-mode
+        go-autocomplete
+        golint
+        terraform-mode
+        ;; LSP mode for IDE-style functionality - https://emacs-lsp.github.io
+        lsp-mode
+        lsp-ui
+        company-lsp
+        lsp-python-ms
+        ;; Data science tooling
+        jupyter
+        ))
+
 (dolist (pkg my-packages)
   (unless (package-installed-p pkg)
     (package-install pkg)))
 
 ;; * ----------------
-;; * User interface and keybindings
+;; * Emacs user interface
 ;; * ----------------
 
 (setq inhibit-splash-screen t)
@@ -57,96 +74,128 @@
 (column-number-mode t)
 (ido-mode t)
 (transient-mark-mode -1)
-(global-hl-line-mode t)
-;(set-face-background 'hl-line "#333")
-(require 'uniquify) ; Uniquify gives buffers sensible unique names
 
+;; Uniquify gives buffers sensible unique names
+(require 'uniquify)
+
+;; Set up the Tomorrow Night theme
 (setq custom-safe-themes t)
 (color-theme-sanityinc-tomorrow-night)
+(global-hl-line-mode t)
 
-;; Things that make life on a Mac better (for when there's no other choice)
+;; Web browsing
+(setq browse-url-browser-function 'eww-browse-url)
+
+;; I don't like Macs, but if there's no other choice, these settings make life a little better
 (when (eq system-type 'darwin)
   (set-face-attribute 'default nil      ; Sensible font
                       :family "Menlo"
                       :height 100
                       :weight 'normal)
-  (setq mac-command-modifier 'control)  ; Carbon Emacs seems to swap command and control, which would usually be welcome
-  (setq mac-control-modifier 'meta)     ; except I already swap these keys system-wide on a Mac, so they need swapping again for Emacs!
+  ;; On Macs, the 'command' and 'control' keys are the wrong way around, so I always swap them
+  ;; Carbon Emacs swaps them too, so they need swapping one more time!
+  (setq mac-command-modifier 'control)
+  (setq mac-control-modifier 'meta)
   (setq mouse-wheel-mode nil)
 )
-
-;; Keybindings
-(global-set-key [f1] 'man)
-;;(global-set-key [f6] 'mu4e)
-(global-set-key [f8] 'gdb)
-(global-set-key [f9] 'compile)
-(global-set-key "\C-x\C-b" 'ibuffer)
-(global-set-key [M-left] 'windmove-left)
-(global-set-key [M-right] 'windmove-right)
-(global-set-key [M-up] 'windmove-up)
-(global-set-key [M-down] 'windmove-down)
-(global-set-key "\r" 'newline-and-indent)
-(global-set-key "\C-c\C-c" 'comment-or-uncomment-region)
-(global-set-key "\M-s\M-o" 'multi-occur-in-this-mode)
-(global-set-key (kbd "<Scroll_Lock>") 'scroll-lock-mode)
 
 ;; When in GUI mode we don't want C-z to minimise Emacs
 (when window-system
   (global-set-key "\C-z" nil)
   (global-set-key "\C-xz" nil))
 
-;; PYIM Chinese input
+;; * ------------------
+;; * Key bindings
+;; * ------------------
+
+(global-set-key [f1] 'man)
+(global-set-key [f8] 'gdb)
+(global-set-key [f9] 'compile)
+
+;; These bindings conflict with org-mode, but I'm too used to them now
+(global-set-key [M-left] 'windmove-left)
+(global-set-key [M-right] 'windmove-right)
+(global-set-key [M-up] 'windmove-up)
+(global-set-key [M-down] 'windmove-down)
+
+;; When programming, you want the cursor to have the proper indent after a new line
+(global-set-key "\r" 'newline-and-indent)
+
+;; It's especially useful to be able to search all buffers in current major mode
+(global-set-key "\M-s\M-o" 'multi-occur-in-this-mode)
+
+;; Comment according to mode
+(global-set-key "\C-c\C-c" 'comment-or-uncomment-region)
+
+;; Yes I still use scroll lock
+(global-set-key (kbd "<Scroll_Lock>") 'scroll-lock-mode)
+
+;; Use ibuffer instead of the default buffer listing
+(global-set-key "\C-x\C-b" 'ibuffer)
+
+;; * ------------------
+;; * Chinese / Mandarin language
+;; * ------------------
+;;
+;; Emacs comes with a set of input methods for a variety of languages (called Mule).
+;;
+;; Unfortunately the Chinese input method is barely adequate if you want to actually compose text in Chinese. The PYIM package is a substantial (but imperfect) improvement.
+;;
+;; See also:
+;; - https://github.com/tumashu/pyim
+;; - https://emacs-china.org
 
 (require 'pyim)
 (require 'pyim-basedict)
 (pyim-basedict-enable)
+
+;; This overrides M-x toggle-input-method (C-\) to use PYIM instead of Mule.
 (setq default-input-method "pyim")
 
-;; Web browsing
-
-(setq browse-url-browser-function 'eww-browse-url)
-
-;; * ----------------
-;; * Networking
-;; * ----------------
-
-(server-start)
-
-;(defun connect-socks ()
-;  (interactive)
-;  (require 'socks)
-;  (setq socks-override-functions 1)
-;  (setq socks-noproxy '("localhost"))
-;  (setq socks-server (list "Socks server" "localhost" 10010 5)))
-
 ;; * ------------------
-;; * Programming
+;; * Programming - general
 ;; * ------------------
-
-(setq auto-mode-alist
-      (append '(("\\.m$"                  . octave-mode)
-                ("\\.ldf$"                . latex-mode)
-                ("\\.js$"                 . javascript-mode)
-                ("\\.s\\(ml\\|ig\\)\\'"   . sml-mode)
-                ("\\.ij[rstp]"            . j-mode)
-                ("\\.markdown$"           . markdown-mode)
-                ("\\.pom$"                . xml-mode)
-                ("\\.\\(asm\\|s\\)$"      . asm-mode)
-                ("\\.\\(ino\\|pde\\)$"    . arduino-mode)
-                ("\\.\\(bin\\|hex\\|\\out\\|o\\|exe\\|com\\|cmd\\|dll\\|lib\\|dat\\)$" . hexl-mode))
-              auto-mode-alist))
-
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
 (auto-compression-mode t)
 (show-paren-mode t)
 
+;; Line numbers on by default (except org-mode)
+(dolist (mode '(text-mode-hook
+                prog-mode-hook
+                conf-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 1))))
+(dolist (mode '(org-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+;; Do follow version-controlled symlinks
+(setq vc-follow-symlinks t)
+
+;; * ------------------
+;; * Programming - language specific
+;; * ------------------
+;;
+;; We want nice things like auto-complete, code navigation, syntax checking and linting
+;; Some languages (e.g. Golang) provide good tools that can integrate easily into Emacs
+;; Some languages have good third-party tooling, for instance Scala has Metals
+;; For languages including Python and Javascript, the LSP ecosystem looks promising
+;;
+;; LSP is a protocol to enable programming languages to interoperate with IDEs and text editors.
+;; A language 'server' provides the IDE-like functionality for each language, and any IDE/editor can make use of that functionality.
+;; (See also Google Grok / Kythe, a simillar but abandonned project https://en.wikipedia.org/wiki/Google_Kythe).
+;;
+;; See https://emacs-lsp.github.io/lsp-mode
+;;     https://microsoft.github.io/language-server-protocol
+
 ;; Python
 
-(add-hook 'python-mode-hook 'jedi:setup)
-(setq jedi:complete-on-dot t)
+;; Pre-requisites: make sure a suitable LSP server is installed, for instance https://github.com/palantir/python-language-server or https://github.com/Microsoft/python-language-server
+(add-hook 'python-mode-hook 'lsp-deferred)
+(setq python-shell-interpreter "python3")
 
 ;; Go
+
+;; Pre-requisites
 ;; This needs to be accompanied with some Go tooling installation:
 ;; - Emacs packages: go-mode, go-autocomplete, golint
 ;; - Go packages:
@@ -175,12 +224,12 @@
   (auto-complete-mode 1))
 (add-hook 'go-mode-hook 'auto-complete-for-go)
 
-;; cc-mode
+;; C and C++
 (require 'cc-mode)
 (c-set-offset 'substatement-open 0) ;; No additional indentation for braces
 (c-toggle-auto-newline)
 
-;; ELDoc
+;; Lisp and Scheme
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
 (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
 (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
@@ -227,13 +276,6 @@
 
 ;; Prolog
 (setq prolog-program "gprolog")
-
-;; Java
-(add-hook 'java-mode-hook
-      (lambda ()
-        "Treat Java 1.5 @-style annotations as comments."
-        (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
-        (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
 
 ;; LaTeX
 (setq tex-dvi-view-command "atril *.pdf")
@@ -356,7 +398,7 @@
  '(custom-enabled-themes (quote (sanityinc-tomorrow-night)))
  '(package-selected-packages
    (quote
-    (processing-mode flycheck dash-functional org-trello jedi pomodoro xr pyim pinyin coffee-mode elpy golint go-autocomplete scala-mode dockerfile-mode exec-path-from-shell ein jupyter yaml-mode websocket terraform-mode slime request oauth2 markdown-mode magit json-mode go-mode emojify color-theme-sanityinc-tomorrow circe alert))))
+    (doom-themes doom-theme use-package lsp-python-ms company-lsp lsp-ui gnu-elpa-keyring-update lsp-mode processing-mode flycheck dash-functional org-trello jedi pomodoro xr pyim pinyin coffee-mode elpy golint go-autocomplete scala-mode dockerfile-mode exec-path-from-shell ein jupyter yaml-mode websocket terraform-mode slime request oauth2 markdown-mode magit json-mode go-mode emojify color-theme-sanityinc-tomorrow circe alert))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
