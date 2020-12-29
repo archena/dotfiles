@@ -5,8 +5,35 @@
 ;;
 ;; http://www.github.com/archena
 
+;; n.b. use-package is used inconsistently. Everything will probably be ported eventually
+
+;; * ------------------
+;; * Generic initialisation
+;; * ------------------
+
 ;; Enable Emacs server
 (server-start)
+
+;; I don't want Emacs to interactively update or persist any configuration; this .emacs file is the sole source of truth
+(setq custom-file (concat user-emacs-directory "/dev/null"))
+(when (file-exists-p custom-file) (load custom-file))
+
+;; After installing Emacs 8 on Ubuntu Mate on a laptop with a 4k UHD display, the Emacs frame is unusable due to fonts and other ui components being too small.
+;;
+;; Haven't quite found a generic fix for this but a workaround for my specific setup is to zoom in 18 times
+;; n.b. this requires the zoom-frm package, which is not on ELPA/MELPA - https://www.emacswiki.org/emacs/zoom-frm.el
+
+(add-to-list 'load-path "~/zoom-frm")
+(require 'zoom-frm)
+
+(defun zoom-frame (&optional frame)
+  (interactive)
+  (setq count 0)
+  (while (< count 18)
+    (zoom-frm-in frame)
+    (setq count (1+ count))))
+
+(zoom-frame)
 
 ;; * ----------------
 ;; * Packages
@@ -32,8 +59,8 @@
         ;;use-package
         magit
         pyim
+        emojify
         ;; Programming tooling
-	    slime
 	    markdown-mode
 	    yaml-mode
 	    json-mode
@@ -46,8 +73,8 @@
         lsp-ui
         company-lsp
         lsp-python-ms
-        ;; Data science tooling
-        jupyter
+        ;; Emacs ipython notebooks / Jupyter mode
+        ein
         ))
 
 (dolist (pkg my-packages)
@@ -79,12 +106,20 @@
 (require 'uniquify)
 
 ;; Set up the Tomorrow Night theme
-(setq custom-safe-themes t)
-(color-theme-sanityinc-tomorrow-night)
+(load-theme 'sanityinc-tomorrow-night t)
 (global-hl-line-mode t)
 
 ;; Web browsing
 (setq browse-url-browser-function 'eww-browse-url)
+
+;; Treemacs - https://github.com/Alexander-Miller/treemacs
+;; (use-package treemacs
+;;   :ensure t
+;;   :defer t
+;;   :init
+
+;;   (treemacs-follow-mode t)
+;;   (treemacs-filewatch-mode t))
 
 ;; I don't like Macs, but if there's no other choice, these settings make life a little better
 (when (eq system-type 'darwin)
@@ -187,13 +222,31 @@
 ;; See https://emacs-lsp.github.io/lsp-mode
 ;;     https://microsoft.github.io/language-server-protocol
 
-;; Python
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :config)
+
+(use-package flycheck
+  :defer t
+  :hook (lsp-mode . flycheck-mode))
+
+(use-package yasnippet
+  :hook (prog-mode . yas-minor-mode)
+  :config
+  (yas-reload-all))
+
+;; (use-package lsp-treemacs
+;;   :after lsp)
+
+;; ** Python **
 
 ;; Pre-requisites: make sure a suitable LSP server is installed, for instance https://github.com/palantir/python-language-server or https://github.com/Microsoft/python-language-server
 (add-hook 'python-mode-hook 'lsp-deferred)
 (setq python-shell-interpreter "python3")
 
-;; Go
+;; ** Go **
 
 ;; Pre-requisites
 ;; This needs to be accompanied with some Go tooling installation:
@@ -207,7 +260,7 @@
 
 (defun my-go-mode-hook ()
   (require 'golint)
-  ; Use goimports instead of go-fmt
+  ;; Use goimports instead of go-fmt
   (setq gofmt-command "goimports")
 
   (add-hook 'before-save-hook 'gofmt-before-save)
@@ -224,28 +277,23 @@
   (auto-complete-mode 1))
 (add-hook 'go-mode-hook 'auto-complete-for-go)
 
-;; C and C++
+;; ** C and C++ **
 (require 'cc-mode)
 (c-set-offset 'substatement-open 0) ;; No additional indentation for braces
 (c-toggle-auto-newline)
 
-;; Lisp and Scheme
+;; ** Lisp and Scheme **
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
 (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
 (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
 (add-hook 'scheme-mode-hook 'turn-on-eldoc-mode)
 
-;; Scheme
 (setq scheme-program-name "guile")
 
-;; SLIME Lisp environment
-(setq inferior-lisp-program "sbcl")
-(require 'slime-autoloads)
-(slime-setup)
-
-;; Haskell mode
+;; Haskell
+;; TODO: Check current recommended approach for Haskell
 ;; n.b. haskell-site-file contains all the necessary autoloads
-;(add-to-list 'load-path (my-load-path "haskell-mode"))
+                                        ;(add-to-list 'load-path (my-load-path "haskell-mode"))
 ;(require 'haskell-mode-autoloads)
 ;(add-to-list 'Info-default-directory-list "~/emacs/haskell-mode/")
 ;(define-key haskell-mode-map (kbd "C-c <") 'haskell-move-nested-left)
@@ -259,30 +307,45 @@
 ;(setq haskell-program-name "ghci")
 
 ;; Scala
-;(add-to-list 'load-path (my-load-path "scala-mode2"))
-;(require 'scala-mode2)
-
+;; TODO look into the current favourite major mode Scala
+;; Set up Metals
 ;(defun scala-custom-hook ()
   ;; scala-mode rebinds RET to scala-newline; I wish it didn't.
   ;; I /like/ newline-and-indent
 ;  (local-set-key "\r" 'newline-and-indent))
 ;(add-hook 'scala-mode-hook 'scala-custom-hook)
 
-;(defalias 'run-scala 'scala-run-scala)
-
-;(add-to-list 'load-path (my-load-path "ensime/elisp/"))
-;(require 'ensime)
-;(add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
-
-;; Prolog
+;; ** Prolog **
 (setq prolog-program "gprolog")
 
-;; LaTeX
+;; ** CSS **
+(setq css-indent-offset 2)
+
+;; * ------------------
+;; * Text composition and typesetting
+;; * ------------------
+
+;; ** Markdown **
+(use-package markdown-mode
+  :mode "\\.md\\'"
+  :config
+  (setq markdown-command "marked")
+  (defun dw/set-markdown-header-font-sizes ()
+    (dolist (face '((markdown-header-face-1 . 1.2)
+                    (markdown-header-face-2 . 1.1)
+                    (markdown-header-face-3 . 1.0)
+                    (markdown-header-face-4 . 1.0)
+                    (markdown-header-face-5 . 1.0)))
+      (set-face-attribute (car face) nil :weight 'normal :height (cdr face))))
+
+  (defun dw/markdown-mode-hook ()
+    (dw/set-markdown-header-font-sizes))
+
+  (add-hook 'markdown-mode-hook 'dw/markdown-mode-hook))
+
+;; ** LaTeX **
 (setq tex-dvi-view-command "atril *.pdf")
 (setq latex-run-command "pdflatex")
-
-;; CSS
-(setq css-indent-offset 2)
 
 ;; * ------------------
 ;; * Org-mode and remember-mode
@@ -313,6 +376,14 @@
 ;(require 'mu4e)
 ;(defalias 'mu 'mu4e)
 ;(load "email.el")
+
+;; * ------------------
+;; * IRC / chat
+;; * ------------------
+
+(use-package emojify
+  :hook (erc-mode . emojify-mode)
+  :commands emojify-mode)
 
 ;; * ----------------
 ;; * Useful functions
@@ -390,18 +461,3 @@
            (set-window-buffer w2 b1)
            (set-window-start w1 s2)
            (set-window-start w2 s1)))))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-enabled-themes (quote (sanityinc-tomorrow-night)))
- '(package-selected-packages
-   (quote
-    (doom-themes doom-theme use-package lsp-python-ms company-lsp lsp-ui gnu-elpa-keyring-update lsp-mode processing-mode flycheck dash-functional org-trello jedi pomodoro xr pyim pinyin coffee-mode elpy golint go-autocomplete scala-mode dockerfile-mode exec-path-from-shell ein jupyter yaml-mode websocket terraform-mode slime request oauth2 markdown-mode magit json-mode go-mode emojify color-theme-sanityinc-tomorrow circe alert))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
