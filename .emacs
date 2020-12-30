@@ -19,21 +19,10 @@
 (when (file-exists-p custom-file) (load custom-file))
 
 ;; After installing Emacs 8 on Ubuntu Mate on a laptop with a 4k UHD display, the Emacs frame is unusable due to fonts and other ui components being too small.
-;;
-;; Haven't quite found a generic fix for this but a workaround for my specific setup is to zoom in 18 times
-;; n.b. this requires the zoom-frm package, which is not on ELPA/MELPA - https://www.emacswiki.org/emacs/zoom-frm.el
+;; The best fix I've found is to set crazy font sizes, but this is only suitable for my specific machine
+;; n.b. I'm also using the Fira Code font which needs to be installed separately
 
-(add-to-list 'load-path "~/zoom-frm")
-(require 'zoom-frm)
-
-(defun zoom-frame (&optional frame)
-  (interactive)
-  (setq count 0)
-  (while (< count 18)
-    (zoom-frm-in frame)
-    (setq count (1+ count))))
-
-(zoom-frame)
+(set-face-attribute 'default nil :font "Fira Code" :height 240)
 
 ;; * ----------------
 ;; * Packages
@@ -56,7 +45,7 @@
 
 (setq my-packages
       '(color-theme-sanityinc-tomorrow
-        ;;use-package
+        use-package
         magit
         pyim
         emojify
@@ -68,6 +57,7 @@
         go-autocomplete
         golint
         terraform-mode
+        pyenv-mode
         ;; LSP mode for IDE-style functionality - https://emacs-lsp.github.io
         lsp-mode
         lsp-ui
@@ -80,6 +70,9 @@
 (dolist (pkg my-packages)
   (unless (package-installed-p pkg)
     (package-install pkg)))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
 
 ;; * ----------------
 ;; * Emacs user interface
@@ -111,6 +104,9 @@
 
 ;; Web browsing
 (setq browse-url-browser-function 'eww-browse-url)
+
+(use-package which-key
+  :init (which-key-mode))
 
 ;; Treemacs - https://github.com/Alexander-Miller/treemacs
 ;; (use-package treemacs
@@ -227,7 +223,7 @@
   :init
   (setq lsp-keymap-prefix "C-c l")
   :config)
-
+(setq lsp-ui-sideline-enable nil)
 (use-package flycheck
   :defer t
   :hook (lsp-mode . flycheck-mode))
@@ -237,6 +233,9 @@
   :config
   (yas-reload-all))
 
+;; No documentation popups by default - use M-x lsp-ui-doc-glance / -show to view docs
+(setq lsp-ui-doc-enable nil)
+
 ;; (use-package lsp-treemacs
 ;;   :after lsp)
 
@@ -245,6 +244,10 @@
 ;; Pre-requisites: make sure a suitable LSP server is installed, for instance https://github.com/palantir/python-language-server or https://github.com/Microsoft/python-language-server
 (add-hook 'python-mode-hook 'lsp-deferred)
 (setq python-shell-interpreter "python3")
+
+(use-package conda
+  :init
+  (setq conda-env-home-directory "~/anaconda3"))
 
 ;; ** Go **
 
