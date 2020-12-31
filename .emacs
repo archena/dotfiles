@@ -21,7 +21,6 @@
 ;; After installing Emacs 8 on Ubuntu Mate on a laptop with a 4k UHD display, the Emacs frame is unusable due to fonts and other ui components being too small.
 ;; The best fix I've found is to set crazy font sizes, but this is only suitable for my specific machine
 ;; n.b. I'm also using the Fira Code font which needs to be installed separately
-
 (set-face-attribute 'default nil :font "Fira Code" :height 240)
 
 ;; * ----------------
