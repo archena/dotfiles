@@ -21,7 +21,7 @@
 ;; After installing Emacs 8 on Ubuntu Mate on a laptop with a 4k UHD display, the Emacs frame is unusable due to fonts and other ui components being too small.
 ;; The best fix I've found is to set crazy font sizes, but this is only suitable for my specific machine
 ;; n.b. I'm also using the Fira Code font which needs to be installed separately
-(set-face-attribute 'default nil :font "Fira Code" :height 240)
+(set-face-attribute 'default nil :font "Fira Code")
 
 ;; * ----------------
 ;; * Packages
@@ -98,7 +98,7 @@
 (require 'uniquify)
 
 ;; Set up the Tomorrow Night theme
-(load-theme 'sanityinc-tomorrow-night t)
+(load-theme 'sanityinc-tomorrow-day t)
 (global-hl-line-mode t)
 
 ;; Web browsing
@@ -181,6 +181,16 @@
 
 ;; This overrides M-x toggle-input-method (C-\) to use PYIM instead of Mule.
 (setq default-input-method "pyim")
+
+;; Fix fonts for org-mode and elsewhre for Chinese characters
+;; While this fixes some problems with fonts, it *doesn't* fix org table alignment
+;; See https://github.com/chen-chao/zh-align.el
+(use-package zh-align
+  :load-path "~/emacs/zh-align.el")
+(use-package org
+  :config
+  (zh-align-set-faces '(org-table)))
+(setq zh-align-charsets '(han kana cjk-misc))
 
 ;; * ------------------
 ;; * Programming - general
