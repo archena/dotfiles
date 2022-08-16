@@ -4,3 +4,4 @@
 
 ln -s dotfiles/.inputrc ~/
 ln -s dotfiles/.emacs ~/
+ln -s dotfiles/.gitconfig ~/
