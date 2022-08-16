@@ -21,6 +21,9 @@
 ;; n.b. I'm also using the Fira Code font which needs to be installed separately
 (set-face-attribute 'default nil :font "Fira Code" :height 160)
 
+;; Make sure the dictionary is English
+(setq ispell-dictionary "en_GB")
+
 ;; * ----------------
 ;; * Packages
 ;; * ----------------
@@ -44,7 +47,7 @@
       '(color-theme-sanityinc-tomorrow
         use-package
         ;magit
-        ;pyim
+        pyim
         ;emojify
         ;; Programming tooling
 	    markdown-mode
@@ -167,18 +170,19 @@
 ;;
 ;; Emacs comes with a set of input methods for a variety of languages (called Mule).
 ;;
-;; Unfortunately the Chinese input method is barely adequate if you want to actually compose text in Chinese. The PYIM package is a substantial (but imperfect) improvement.
+;; Unfortunately the default Chinese input method is barely adequate if you want to actually compose text in Chinese.
+;; The PYIM package is a substantial (but imperfect) improvement.xs
 ;;
 ;; See also:
 ;; - https://github.com/tumashu/pyim
 ;; - https://emacs-china.org
 
-;; (require 'pyim)
-;; (require 'pyim-basedict)
-;; (pyim-basedict-enable)
+(require 'pyim)
+(require 'pyim-basedict)
+(pyim-basedict-enable)
 
-;; ;; This overrides M-x toggle-input-method (C-\) to use PYIM instead of Mule.
-;; (setq default-input-method "pyim")
+This overrides M-x toggle-input-method (C-\) to use PYIM instead of Mule.
+(setq default-input-method "pyim")
 
 ;; Fix fonts for org-mode and elsewhre for Chinese characters
 ;; While this fixes some problems with fonts, it *doesn't* fix org table alignment
