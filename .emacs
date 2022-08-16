@@ -21,7 +21,7 @@
 ;; After installing Emacs 8 on Ubuntu Mate on a laptop with a 4k UHD display, the Emacs frame is unusable due to fonts and other ui components being too small.
 ;; The best fix I've found is to set crazy font sizes, but this is only suitable for my specific machine
 ;; n.b. I'm also using the Fira Code font which needs to be installed separately
-(set-face-attribute 'default nil :font "Fira Code")
+(set-face-attribute 'default nil :font "Fira Code" :height 160)
 
 ;; * ----------------
 ;; * Packages
@@ -45,9 +45,9 @@
 (setq my-packages
       '(color-theme-sanityinc-tomorrow
         use-package
-        magit
-        pyim
-        emojify
+        ;magit
+        ;pyim
+        ;emojify
         ;; Programming tooling
 	    markdown-mode
 	    yaml-mode
@@ -56,12 +56,12 @@
         go-autocomplete
         golint
         terraform-mode
-        pyenv-mode
+        ;pyenv-mode
         ;; LSP mode for IDE-style functionality - https://emacs-lsp.github.io
-        lsp-mode
-        lsp-ui
-        company-lsp
-        lsp-python-ms
+        ;lsp-mode
+        ;lsp-ui
+        ;company-lsp
+        ;lsp-python-ms
         ;; Emacs ipython notebooks / Jupyter mode
         ein
         ))
@@ -175,12 +175,12 @@
 ;; - https://github.com/tumashu/pyim
 ;; - https://emacs-china.org
 
-(require 'pyim)
-(require 'pyim-basedict)
-(pyim-basedict-enable)
+;; (require 'pyim)
+;; (require 'pyim-basedict)
+;; (pyim-basedict-enable)
 
-;; This overrides M-x toggle-input-method (C-\) to use PYIM instead of Mule.
-(setq default-input-method "pyim")
+;; ;; This overrides M-x toggle-input-method (C-\) to use PYIM instead of Mule.
+;; (setq default-input-method "pyim")
 
 ;; Fix fonts for org-mode and elsewhre for Chinese characters
 ;; While this fixes some problems with fonts, it *doesn't* fix org table alignment
@@ -227,23 +227,23 @@
 ;; See https://emacs-lsp.github.io/lsp-mode
 ;;     https://microsoft.github.io/language-server-protocol
 
-(use-package lsp-mode
-  :commands (lsp lsp-deferred)
-  :init
-  (setq lsp-keymap-prefix "C-c l")
-  :config)
-(setq lsp-ui-sideline-enable nil)
-(use-package flycheck
-  :defer t
-  :hook (lsp-mode . flycheck-mode))
+;; (use-package lsp-mode
+;;   :commands (lsp lsp-deferred)
+;;   :init
+;;   (setq lsp-keymap-prefix "C-c l")
+;;   :config)
+;; (setq lsp-ui-sideline-enable nil)
+;; (use-package flycheck
+;;   :defer t
+;;   :hook (lsp-mode . flycheck-mode))
 
-(use-package yasnippet
-  :hook (prog-mode . yas-minor-mode)
-  :config
-  (yas-reload-all))
+;; (use-package yasnippet
+;;   :hook (prog-mode . yas-minor-mode)
+;;   :config
+;;   (yas-reload-all))
 
-;; No documentation popups by default - use M-x lsp-ui-doc-glance / -show to view docs
-(setq lsp-ui-doc-enable nil)
+;; ;; No documentation popups by default - use M-x lsp-ui-doc-glance / -show to view docs
+;; (setq lsp-ui-doc-enable nil)
 
 ;; (use-package lsp-treemacs
 ;;   :after lsp)
@@ -251,12 +251,12 @@
 ;; ** Python **
 
 ;; Pre-requisites: make sure a suitable LSP server is installed, for instance https://github.com/palantir/python-language-server or https://github.com/Microsoft/python-language-server
-(add-hook 'python-mode-hook 'lsp-deferred)
+;(add-hook 'python-mode-hook 'lsp-deferred)
 (setq python-shell-interpreter "python3")
 
-(use-package conda
-  :init
-  (setq conda-env-home-directory "~/anaconda3"))
+;(use-package conda
+;  :init
+;  (setq conda-env-home-directory "~/anaconda3"))
 
 ;; ** Go **
 
@@ -365,7 +365,7 @@
 
 ;; Org-mode
 (setq org-directory "~/docs/org/")
-(setq org-agenda-files '("~/docs/org/tasks.org"))
+(setq org-agenda-files '("~/docs/org/planner.org"))
 (define-key global-map "\C-ca" 'org-agenda)
 
 (setq remember-annotation-functions '(org-remember-annotation))
