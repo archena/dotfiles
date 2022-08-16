@@ -5,8 +5,6 @@
 ;;
 ;; http://www.github.com/archena
 
-;; n.b. use-package is used inconsistently. Everything will probably be ported eventually
-
 ;; * ------------------
 ;; * Generic initialisation
 ;; * ------------------
