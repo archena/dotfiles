@@ -181,7 +181,7 @@
 (require 'pyim-basedict)
 (pyim-basedict-enable)
 
-This overrides M-x toggle-input-method (C-\) to use PYIM instead of Mule.
+;; This overrides M-x toggle-input-method (C-\) to use PYIM instead of Mule.
 (setq default-input-method "pyim")
 
 ;; Fix fonts for org-mode and elsewhre for Chinese characters
