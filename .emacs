@@ -19,7 +19,7 @@
 ;; After installing Emacs 8 on Ubuntu Mate on a laptop with a 4k UHD display, the Emacs frame is unusable due to fonts and other ui components being too small.
 ;; The best fix I've found is to set crazy font sizes, but this is only suitable for my specific machine
 ;; n.b. I'm also using the Fira Code font which needs to be installed separately
-(set-face-attribute 'default nil :font "Fira Code" :height 160)
+;(set-face-attribute 'default nil :font "Fira Code" :height 160)
 
 ;; Make sure the dictionary is English
 (setq ispell-dictionary "en_GB")
@@ -90,7 +90,7 @@
 (tool-bar-mode -1)
 (set-scroll-bar-mode nil)
 (display-time-mode t)
-(display-battery-mode t)
+;;(display-battery-mode t)
 (column-number-mode t)
 (ido-mode t)
 (transient-mark-mode -1)
@@ -99,7 +99,7 @@
 (require 'uniquify)
 
 ;; Set up the Tomorrow Night theme
-(load-theme 'sanityinc-tomorrow-day t)
+(load-theme 'sanityinc-tomorrow-night t)
 (global-hl-line-mode t)
 
 ;; Web browsing
@@ -177,22 +177,22 @@
 ;; - https://github.com/tumashu/pyim
 ;; - https://emacs-china.org
 
-(require 'pyim)
-(require 'pyim-basedict)
-(pyim-basedict-enable)
+;;(require 'pyim)
+;;(require 'pyim-basedict)
+;;(pyim-basedict-enable)
 
 ;; This overrides M-x toggle-input-method (C-\) to use PYIM instead of Mule.
-(setq default-input-method "pyim")
+;;(setq default-input-method "pyim")
 
-;; Fix fonts for org-mode and elsewhre for Chinese characters
-;; While this fixes some problems with fonts, it *doesn't* fix org table alignment
-;; See https://github.com/chen-chao/zh-align.el
-(use-package zh-align
-  :load-path "~/emacs/zh-align.el")
-(use-package org
-  :config
-  (zh-align-set-faces '(org-table)))
-(setq zh-align-charsets '(han kana cjk-misc))
+;; ;; Fix fonts for org-mode and elsewhre for Chinese characters
+;; ;; While this fixes some problems with fonts, it *doesn't* fix org table alignment
+;; ;; See https://github.com/chen-chao/zh-align.el
+;; (use-package zh-align
+;;   :load-path "~/emacs/zh-align.el")
+;; (use-package org
+;;   :config
+;;   (zh-align-set-faces '(org-table)))
+;; (setq zh-align-charsets '(han kana cjk-misc))
 
 ;; * ------------------
 ;; * Programming - general
