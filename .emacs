@@ -47,12 +47,12 @@
       '(color-theme-sanityinc-tomorrow
         use-package
         ;magit
-        pyim
+        ;;pyim
         ;emojify
         ;; Programming tooling
-	    markdown-mode
-	    yaml-mode
-	    json-mode
+	markdown-mode
+	yaml-mode
+	json-mode
         go-mode
         go-autocomplete
         golint
@@ -64,12 +64,12 @@
         ;company-lsp
         ;lsp-python-ms
         ;; Emacs ipython notebooks / Jupyter mode
-        ein
+        ;;ein
         ))
 
-(dolist (pkg my-packages)
-  (unless (package-installed-p pkg)
-    (package-install pkg)))
+;; (dolist (pkg my-packages)
+;;   (unless (package-installed-p pkg)
+;;     (package-install pkg)))
 
 (require 'use-package)
 (setq use-package-always-ensure t)
@@ -177,12 +177,12 @@
 ;; - https://github.com/tumashu/pyim
 ;; - https://emacs-china.org
 
-;;(require 'pyim)
-;;(require 'pyim-basedict)
-;;(pyim-basedict-enable)
+;; (require 'pyim)
+;; (require 'pyim-basedict)
+;; (pyim-basedict-enable)
 
-;; This overrides M-x toggle-input-method (C-\) to use PYIM instead of Mule.
-;;(setq default-input-method "pyim")
+;; ;; This overrides M-x toggle-input-method (C-\) to use PYIM instead of Mule.
+;; (setq default-input-method "pyim")
 
 ;; ;; Fix fonts for org-mode and elsewhre for Chinese characters
 ;; ;; While this fixes some problems with fonts, it *doesn't* fix org table alignment
@@ -292,9 +292,9 @@
 (add-hook 'go-mode-hook 'auto-complete-for-go)
 
 ;; ** C and C++ **
-(require 'cc-mode)
-(c-set-offset 'substatement-open 0) ;; No additional indentation for braces
-(c-toggle-auto-newline)
+;;(require 'cc-mode)
+;;(c-set-offset 'substatement-open 0) ;; No additional indentation for braces
+;;(c-toggle-auto-newline)
 
 ;; ** Lisp and Scheme **
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
@@ -367,7 +367,7 @@
 
 ;; Org-mode
 (setq org-directory "~/docs/org/")
-(setq org-agenda-files '("~/docs/org/planner.org"))
+(setq org-agenda-files '("~/docs/org/feb-hit-list.org"))
 (define-key global-map "\C-ca" 'org-agenda)
 
 (setq remember-annotation-functions '(org-remember-annotation))
