@@ -367,17 +367,21 @@
 
 ;; Org-mode
 (setq org-directory "~/docs/org/")
-(setq org-agenda-files '("~/docs/org/feb-hit-list.org"))
+
+(defun refresh-org-agenda-files () (setq org-agenda-files (directory-files-recursively "~/docs/org/" "^[a-zA-Z0-9-]+\\.org$")))
+(add-hook 'org-agenda-mode-hook 'refresh-org-agenda-files)
+
 (define-key global-map "\C-ca" 'org-agenda)
+(define-key global-map "\C-cl" 'org-store-link)
 
-(setq remember-annotation-functions '(org-remember-annotation))
-(setq remember-handler-functions '(org-remember-handler))
-(add-hook 'remember-mode-hook 'org-remember-apply-template)
-(define-key global-map "\C-cr" 'org-remember)
+;; (setq remember-annotation-functions '(org-remember-annotation))
+;; (setq remember-handler-functions '(org-remember-handler))
+;; (add-hook 'remember-mode-hook 'org-remember-apply-template)
+;; (define-key global-map "\C-cr" 'org-remember)
 
-(setq org-remember-templates '(("Contact" ?c "** TODO Contact %^{Name} regarding %^{Regarding} :contact:\n" "~/docs/org/tasks.org" "Contact")
-                               ("Appointment" ?a "** TODO %^{Name} at %^{Location} %^{Time} :appointment:\n" "~/docs/org/tasks.org" "Appointments")
-                               ("Remember" ?r "** TODO %^{Thing}\n" "~/docs/org/tasks.org" "Remember tasks")))
+;; (setq org-remember-templates '(("Contact" ?c "** TODO Contact %^{Name} regarding %^{Regarding} :contact:\n" "~/docs/org/tasks.org" "Contact")
+;;                                ("Appointment" ?a "** TODO %^{Name} at %^{Location} %^{Time} :appointment:\n" "~/docs/org/tasks.org" "Appointments")
+;;                                ("Remember" ?r "** TODO %^{Thing}\n" "~/docs/org/tasks.org" "Remember tasks")))
 
 (setq org-tags-match-list-sublevels t)
 (setq org-enforce-todo-dependencies t)
