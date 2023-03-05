@@ -1,7 +1,8 @@
 ;; Archena's .emacs config file
 ;; - started 17:44 on 10/05/2009
 ;; - mostly re-written 20:33 on 30/05/2019
-;; - another re-work on 19:41 28/12/20
+;; - another re-work on 19:41 28/12/2020
+;; - customise workflows for org-mode around 04/03/2023
 ;;
 ;; http://www.github.com/archena
 
@@ -15,11 +16,6 @@
 ;; I don't want Emacs to interactively update or persist any configuration; this .emacs file is the sole source of truth
 (setq custom-file (concat user-emacs-directory "/dev/null"))
 (when (file-exists-p custom-file) (load custom-file))
-
-;; After installing Emacs 8 on Ubuntu Mate on a laptop with a 4k UHD display, the Emacs frame is unusable due to fonts and other ui components being too small.
-;; The best fix I've found is to set crazy font sizes, but this is only suitable for my specific machine
-;; n.b. I'm also using the Fira Code font which needs to be installed separately
-;(set-face-attribute 'default nil :font "Fira Code" :height 160)
 
 ;; Make sure the dictionary is English
 (setq ispell-dictionary "en_GB")
@@ -43,36 +39,59 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-(setq my-packages
-      '(color-theme-sanityinc-tomorrow
-        use-package
-        ;magit
-        ;;pyim
-        ;emojify
-        ;; Programming tooling
-	markdown-mode
-	yaml-mode
-	json-mode
-        go-mode
-        go-autocomplete
-        golint
-        terraform-mode
-        ;pyenv-mode
-        ;; LSP mode for IDE-style functionality - https://emacs-lsp.github.io
-        ;lsp-mode
-        ;lsp-ui
-        ;company-lsp
-        ;lsp-python-ms
-        ;; Emacs ipython notebooks / Jupyter mode
-        ;;ein
-        ))
-
+;; n.b. `use-package-always-ensure` will already install any packages that are specifically mentioned in .emacs
+;; But some packages will still need explicit installation. TODO: review these and prune the list
+;; (setq my-packages
+;;       '(color-theme-sanityinc-tomorrow
+;;         use-package
+;;         ;magit
+;;         ;;pyim
+;;         ;emojify
+;;         ;; Programming tooling
+;;          markdown-mode
+;;          yaml-mode
+;;          json-mode
+;;         go-mode
+;;         go-autocomplete
+;;         golint
+;;         terraform-mode
+;;         ligature
+;;         ;pyenv-mode
+;;         ;; LSP mode for IDE-style functionality - https://emacs-lsp.github.io
+;;         ;lsp-mode
+;;         ;lsp-ui
+;;         ;company-lsp
+;;         ;lsp-python-ms
+;;         ;; Emacs ipython notebooks / Jupyter mode
+;;         ;;ein
+;;         ))
 ;; (dolist (pkg my-packages)
 ;;   (unless (package-installed-p pkg)
 ;;     (package-install pkg)))
 
 (require 'use-package)
 (setq use-package-always-ensure t)
+
+;; * ----------------
+;; * Fonts
+;; * ----------------
+
+;; Using the Fira Code font which needs to be installed separately: https://github.com/tonsky/FiraCode
+;; n.b. font size is specific to my machine with 4K UHD displays
+(set-face-attribute 'default nil :font "Fira Code" :height 180)
+
+;; Enable ligatures in programming modes: https://github.com/mickeynp/ligature.el
+(ligature-set-ligatures 'prog-mode '("**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
+                                     ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
+                                     "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
+                                     "#_(" ".-" ".=" ".." "..<" "..." "?=" "??" ";;" "/*" "/**"
+                                     "/=" "/==" "/>" "//" "///" "&&" "||" "||=" "|=" "|>" "^=" "$>"
+                                     "++" "+++" "+>" "=:=" "==" "===" "==>" "=>" "=>>" "<="
+                                     "=<<" "=/=" ">-" ">=" ">=>" ">>" ">>-" ">>=" ">>>" "<*"
+                                     "<*>" "<|" "<|>" "<$" "<$>" "<!--" "<-" "<--" "<->" "<+"
+                                     "<+>" "<=" "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<"
+                                     "<~" "<~~" "</" "</>" "~@" "~-" "~>" "~~" "~~>" "%%"))
+(global-ligature-mode 't)
 
 ;; * ----------------
 ;; * Emacs user interface
@@ -108,23 +127,14 @@
 (use-package which-key
   :init (which-key-mode))
 
-;; Treemacs - https://github.com/Alexander-Miller/treemacs
-;; (use-package treemacs
-;;   :ensure t
-;;   :defer t
-;;   :init
-
-;;   (treemacs-follow-mode t)
-;;   (treemacs-filewatch-mode t))
-
 ;; I don't like Macs, but if there's no other choice, these settings make life a little better
 (when (eq system-type 'darwin)
   (set-face-attribute 'default nil      ; Sensible font
                       :family "Menlo"
                       :height 100
                       :weight 'normal)
-  ;; On Macs, the 'command' and 'control' keys are the wrong way around, so I always swap them
-  ;; Carbon Emacs swaps them too, so they need swapping one more time!
+  ;; On Macs, the 'command' and 'control' keys are the wrong way around, so I always swap them (at a global OS level)
+  ;; But I also use Carbon Emacs, which swaps them too. So they need swapping one more time!
   (setq mac-command-modifier 'control)
   (setq mac-control-modifier 'meta)
   (setq mouse-wheel-mode nil)
@@ -149,16 +159,16 @@
 (global-set-key [M-up] 'windmove-up)
 (global-set-key [M-down] 'windmove-down)
 
-;; When programming, you want the cursor to have the proper indent after a new line
+;; Useful for programming: after a newline, the cursor will already be at the expected indent level
 (global-set-key "\r" 'newline-and-indent)
 
-;; It's especially useful to be able to search all buffers in current major mode
+;; It's especially useful to be able to search all buffers with the current major mode
 (global-set-key "\M-s\M-o" 'multi-occur-in-this-mode)
 
 ;; Comment according to mode
 (global-set-key "\C-c\C-c" 'comment-or-uncomment-region)
 
-;; Yes I still use scroll lock
+;; Yes I do use scroll lock
 (global-set-key (kbd "<Scroll_Lock>") 'scroll-lock-mode)
 
 ;; Use ibuffer instead of the default buffer listing
@@ -171,7 +181,8 @@
 ;; Emacs comes with a set of input methods for a variety of languages (called Mule).
 ;;
 ;; Unfortunately the default Chinese input method is barely adequate if you want to actually compose text in Chinese.
-;; The PYIM package is a substantial (but imperfect) improvement.xs
+;; The best option is to just let the OS provide an input method (such as fcitx on Linux)
+;; Alternatively, the PYIM package is a substantial (but imperfect) improvement
 ;;
 ;; See also:
 ;; - https://github.com/tumashu/pyim
@@ -184,7 +195,7 @@
 ;; ;; This overrides M-x toggle-input-method (C-\) to use PYIM instead of Mule.
 ;; (setq default-input-method "pyim")
 
-;; ;; Fix fonts for org-mode and elsewhre for Chinese characters
+;; ;; Fix fonts for org-mode and elsewhere for Chinese characters
 ;; ;; While this fixes some problems with fonts, it *doesn't* fix org table alignment
 ;; ;; See https://github.com/chen-chao/zh-align.el
 ;; (use-package zh-align
@@ -365,14 +376,27 @@
 ;; * Org-mode and remember-mode
 ;; * ------------------
 
-;; Org-mode
 (setq org-directory "~/docs/org/")
 
+;; Include *every* file in org agenda, and always refresh the file list before generating the agenda
 (defun refresh-org-agenda-files () (setq org-agenda-files (directory-files-recursively "~/docs/org/" "^[a-zA-Z0-9-]+\\.org$")))
 (add-hook 'org-agenda-mode-hook 'refresh-org-agenda-files)
 
+;; Keybindings and preferences
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cl" 'org-store-link)
+(setq org-tags-match-list-sublevels t)
+(setq org-enforce-todo-dependencies t)
+
+;; Convenience functions for using important/urgent tags (Covey / Eisenhower matrix style)
+;; See: https://docs.tompurl.com/apps/collectives/p/HqZ2WE93bMSXcdG/Tom%20Purl%27s%20Digital%20Garden/Articles/Tech/Using%20The%20Eisenhower%20Matrix%20In%20Emacs%20Org-Mode?fileId=70582
+(setq org-tag-alist '(("important" . ?i)
+                      ("urgent"    . ?u)))
+(setq org-agenda-custom-commands
+   '(("1" "Q1" tags-todo "+important+urgent")
+     ("2" "Q2" tags-todo "+important-urgent")
+     ("3" "Q3" tags-todo "-important+urgent")
+     ("4" "Q4" tags-todo "-important-urgent")))
 
 ;; (setq remember-annotation-functions '(org-remember-annotation))
 ;; (setq remember-handler-functions '(org-remember-handler))
@@ -383,8 +407,6 @@
 ;;                                ("Appointment" ?a "** TODO %^{Name} at %^{Location} %^{Time} :appointment:\n" "~/docs/org/tasks.org" "Appointments")
 ;;                                ("Remember" ?r "** TODO %^{Thing}\n" "~/docs/org/tasks.org" "Remember tasks")))
 
-(setq org-tags-match-list-sublevels t)
-(setq org-enforce-todo-dependencies t)
 
 ;; * ----------------
 ;; * Mail and IM
@@ -456,26 +478,3 @@
 (defun untabify-buffer ()
   (interactive)
   (untabify (point-min) (point-max)))
-
-;; Count words in buffer
-(defun count-words ()
-  (interactive)
-  (message "%s" (count-matches "[a-zA-Z\-\']+")))
-
-;; Swap two windows (from Steve Yegge)
-(defun swap-windows ()
-  "If you have 2 windows, it swaps them."
-  (interactive)
-  (cond ((not (= (count-windows) 2))
-         (message "You need exactly 2 windows to do this."))
-        (t
-         (let* ((w1 (first (window-list)))
-                (w2 (second (window-list)))
-                (b1 (window-buffer w1))
-                (b2 (window-buffer w2))
-                (s1 (window-start w1))
-                (s2 (window-start w2)))
-           (set-window-buffer w1 b2)
-           (set-window-buffer w2 b1)
-           (set-window-start w1 s2)
-           (set-window-start w2 s1)))))
