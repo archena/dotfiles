@@ -23,9 +23,6 @@
 ;; * ----------------
 ;; * Packages
 ;; * ----------------
-;;
-;; All the packages that I regularly use are added here so that they can be immediately
-;; re-installed if I open Emacs on a new computer, OS install, etc.
 
 (require 'package)
 
@@ -39,8 +36,7 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-;; n.b. `use-package-always-ensure` will already install any packages that are specifically mentioned in .emacs
-;; But some packages will still need explicit installation. TODO: review these and prune the list
+;; n.b. `use-package-always-ensure` will already install any packages as long as they're mentioned with `use-package`
 ;; (setq my-packages
 ;;       '(color-theme-sanityinc-tomorrow
 ;;         use-package
