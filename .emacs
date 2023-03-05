@@ -81,6 +81,7 @@
 (set-face-attribute 'default nil :font "Fira Code" :height 180)
 
 ;; Enable ligatures in programming modes: https://github.com/mickeynp/ligature.el
+(use-package ligature-mode)
 (ligature-set-ligatures 'prog-mode '("**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
                                      ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
                                      "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
