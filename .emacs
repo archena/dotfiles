@@ -60,6 +60,7 @@
 ;;         ;lsp-python-ms
 ;;         ;; Emacs ipython notebooks / Jupyter mode
 ;;         ;;ein
+;;         deft
 ;;         ))
 ;; (dolist (pkg my-packages)
 ;;   (unless (package-installed-p pkg)
@@ -77,7 +78,7 @@
 (set-face-attribute 'default nil :font "Fira Code" :height 180)
 
 ;; Enable ligatures in programming modes: https://github.com/mickeynp/ligature.el
-(use-package ligature-mode)
+;(use-package ligature-mode)
 (ligature-set-ligatures 'prog-mode '("**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
                                      ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
                                      "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
@@ -394,6 +395,12 @@
      ("2" "Q2" tags-todo "+important-urgent")
      ("3" "Q3" tags-todo "-important+urgent")
      ("4" "Q4" tags-todo "-important-urgent")))
+
+;; Deft (experimental)
+(use-package deft)
+(setq deft-extensions '("org"))
+(setq deft-directory org-directory)
+(setq deft-recursive t)
 
 ;; (setq remember-annotation-functions '(org-remember-annotation))
 ;; (setq remember-handler-functions '(org-remember-handler))
