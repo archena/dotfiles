@@ -78,7 +78,7 @@
 (set-face-attribute 'default nil :font "Fira Code" :height 180)
 
 ;; Enable ligatures in programming modes: https://github.com/mickeynp/ligature.el
-;(use-package ligature-mode)
+(use-package ligature)
 (ligature-set-ligatures 'prog-mode '("**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
                                      ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
                                      "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
@@ -395,6 +395,10 @@
      ("2" "Q2" tags-todo "+important-urgent")
      ("3" "Q3" tags-todo "-important+urgent")
      ("4" "Q4" tags-todo "-important-urgent")))
+
+;; TODO states
+(setq org-todo-keywords
+      '((sequence "TODO" "DOING" "|" "DONE")))
 
 ;; Deft (experimental)
 (use-package deft)
