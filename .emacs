@@ -79,7 +79,7 @@
 
 ;; Enable ligatures in programming modes if supported: https://github.com/mickeynp/ligature.el
 (unless (version< emacs-version "28.0")
-  (use-package ligature-mode)
+  (use-package ligature)
   (ligature-set-ligatures 'prog-mode '("**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
                                        ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
                                        "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
