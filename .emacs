@@ -14,8 +14,8 @@
 (server-start)
 
 ;; I don't want Emacs to interactively update or persist any configuration; this .emacs file is the sole source of truth
-(setq custom-file (concat user-emacs-directory "/dev/null"))
-(when (file-exists-p custom-file) (load custom-file))
+;(setq custom-file (concat user-emacs-directory "/dev/null"))
+;(when (file-exists-p custom-file) (load custom-file))
 
 ;; Make sure the dictionary is English
 (setq ispell-dictionary "en_GB")
@@ -75,7 +75,7 @@
 
 ;; Using the Fira Code font which needs to be installed separately: https://github.com/tonsky/FiraCode
 ;; n.b. font size is specific to my machine with 4K UHD displays
-(set-face-attribute 'default nil :font "Fira Code" :height 180)
+;(set-face-attribute 'default nil :font "Fira Code" :height 180)
 
 ;; Enable ligatures in programming modes if supported: https://github.com/mickeynp/ligature.el
 (unless (version< emacs-version "28.0")
