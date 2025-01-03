@@ -389,17 +389,17 @@
 
 ;; Convenience functions for using important/urgent tags (Covey / Eisenhower matrix style)
 ;; See: https://docs.tompurl.com/apps/collectives/p/HqZ2WE93bMSXcdG/Tom%20Purl%27s%20Digital%20Garden/Articles/Tech/Using%20The%20Eisenhower%20Matrix%20In%20Emacs%20Org-Mode?fileId=70582
-(setq org-tag-alist '(("important" . ?i)
-                      ("urgent"    . ?u)))
-(setq org-agenda-custom-commands
-   '(("1" "Q1" tags-todo "+important+urgent")
-     ("2" "Q2" tags-todo "+important-urgent")
-     ("3" "Q3" tags-todo "-important+urgent")
-     ("4" "Q4" tags-todo "-important-urgent")))
+;; (setq org-tag-alist '(("important" . ?i)
+;;                       ("urgent"    . ?u)))
+;; (setq org-agenda-custom-commands
+;;    '(("1" "Q1" tags-todo "+important+urgent")
+;;      ("2" "Q2" tags-todo "+important-urgent")
+;;      ("3" "Q3" tags-todo "-important+urgent")
+;;      ("4" "Q4" tags-todo "-important-urgent")))
 
 ;; TODO states
-(setq org-todo-keywords
-      '((sequence "TODO" "DOING" "|" "DONE")))
+;; (setq org-todo-keywords
+;;       '((sequence "TODO" "DOING" "|" "DONE")))
 
 ;; Deft (experimental)
 (use-package deft)
