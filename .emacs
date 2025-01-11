@@ -217,8 +217,11 @@
                 prog-mode-hook
                 conf-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 1))))
-(dolist (mode '(org-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+(with-eval-after-load 'org
+  (setq org-startup-indented t)
+  (add-hook 'org-mode-hook #'visual-line-mode)
+  (add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0))))
 
 ;; Do follow version-controlled symlinks
 (setq vc-follow-symlinks t)
