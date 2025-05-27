@@ -117,6 +117,7 @@
 (require 'uniquify)
 
 ;; Set up the Tomorrow Night theme
+(use-package color-theme-sanityinc-tomorrow)
 (load-theme 'sanityinc-tomorrow-night t)
 (global-hl-line-mode t)
 
