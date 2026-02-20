@@ -13,12 +13,9 @@
 ;; Enable Emacs server
 (server-start)
 
-;; I don't want Emacs to interactively update or persist any configuration; this .emacs file is the sole source of truth
+;; This prevents Emacs from updating this config file. It prevents interactive configuration
 ;(setq custom-file (concat user-emacs-directory "/dev/null"))
 ;(when (file-exists-p custom-file) (load custom-file))
-
-;; Make sure the dictionary is English
-(setq ispell-dictionary "en_GB")
 
 ;; * ----------------
 ;; * Packages
@@ -26,6 +23,7 @@
 
 (require 'package)
 
+;; Extra package sources in addition to Elpa
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("melpa-stable" . "https://stable.melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
@@ -36,36 +34,7 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-;; n.b. `use-package-always-ensure` will already install any packages as long as they're mentioned with `use-package`
-;; (setq my-packages
-;;       '(color-theme-sanityinc-tomorrow
-;;         use-package
-;;         ;magit
-;;         ;;pyim
-;;         ;emojify
-;;         ;; Programming tooling
-;;          markdown-mode
-;;          yaml-mode
-;;          json-mode
-;;         go-mode
-;;         go-autocomplete
-;;         golint
-;;         terraform-mode
-;;         ligature
-;;         ;pyenv-mode
-;;         ;; LSP mode for IDE-style functionality - https://emacs-lsp.github.io
-;;         ;lsp-mode
-;;         ;lsp-ui
-;;         ;company-lsp
-;;         ;lsp-python-ms
-;;         ;; Emacs ipython notebooks / Jupyter mode
-;;         ;;ein
-;;         deft
-;;         ))
-;; (dolist (pkg my-packages)
-;;   (unless (package-installed-p pkg)
-;;     (package-install pkg)))
-
+;; use-package auto-installs packages. It's used throughout this file.
 (require 'use-package)
 (setq use-package-always-ensure t)
 
@@ -73,9 +42,10 @@
 ;; * Fonts
 ;; * ----------------
 
-;; Using the Fira Code font which needs to be installed separately: https://github.com/tonsky/FiraCode
-;; n.b. font size is specific to my machine with 4K UHD displays
-;(set-face-attribute 'default nil :font "Fira Code" :height 180)
+;; The Fira Code font just looks nice
+;; For installation instructions, see https://github.com/tonsky/FiraCode/wiki/Linux-instructions
+;; n.b. the font height is set specifically for my machine with 4K UHD displays
+(set-face-attribute 'default nil :font "Fira Code" :height 160)
 
 ;; Enable ligatures in programming modes if supported: https://github.com/mickeynp/ligature.el
 (unless (version< emacs-version "28.0")
@@ -93,7 +63,7 @@
   (global-ligature-mode 't))
 
 ;; * ----------------
-;; * Emacs user interface
+;; * User interface
 ;; * ----------------
 
 (setq inhibit-splash-screen t)
@@ -108,10 +78,10 @@
 (tool-bar-mode -1)
 (set-scroll-bar-mode nil)
 (display-time-mode t)
-;;(display-battery-mode t)
+(display-battery-mode t)
 (column-number-mode t)
 (ido-mode t)
-(transient-mark-mode -1)
+(transient-mark-mode t)
 
 ;; Uniquify gives buffers sensible unique names
 (require 'uniquify)
@@ -123,17 +93,18 @@
 ;; Web browsing
 (setq browse-url-browser-function 'eww-browse-url)
 
+;; Displays a popup with possible completions for a key sequence
 (use-package which-key
   :init (which-key-mode))
 
 ;; I don't like Macs, but if there's no other choice, these settings make life a little better
 (when (eq system-type 'darwin)
-  (set-face-attribute 'default nil      ; Sensible font
-                      :family "Menlo"
-                      :height 100
-                      :weight 'normal)
+  ;(set-face-attribute 'default nil      ; Sensible font
+  ;                    :family "Menlo"
+  ;                    :height 100
+  ;                    :weight 'normal)
   ;; On Macs, the 'command' and 'control' keys are the wrong way around, so I always swap them (at a global OS level)
-  ;; But I also use Carbon Emacs, which swaps them too. So they need swapping one more time!
+  ;; But I also use Carbon Emacs, which separately swaps them, so they need swapping one more time!
   (setq mac-command-modifier 'control)
   (setq mac-control-modifier 'meta)
   (setq mouse-wheel-mode nil)
@@ -152,36 +123,41 @@
 (global-set-key [f8] 'gdb)
 (global-set-key [f9] 'compile)
 
-;; These bindings conflict with org-mode, but I'm too used to them now
+;; Use M-<arrow> keys to move between windows
+;; These bindings are overridden org-mode
 (global-set-key [M-left] 'windmove-left)
 (global-set-key [M-right] 'windmove-right)
 (global-set-key [M-up] 'windmove-up)
 (global-set-key [M-down] 'windmove-down)
 
-;; Useful for programming: after a newline, the cursor will already be at the expected indent level
+;; After a newline, indent the next line based on context. Especially valuable in programming.
 (global-set-key "\r" 'newline-and-indent)
 
 ;; It's especially useful to be able to search all buffers with the current major mode
 (global-set-key "\M-s\M-o" 'multi-occur-in-this-mode)
 
-;; Comment according to mode
+;; Comment a region using the appropriate syntax depending on mode
 (global-set-key "\C-c\C-c" 'comment-or-uncomment-region)
 
-;; Yes I do use scroll lock
+;; Scroll lock is actually useful sometimes
 (global-set-key (kbd "<Scroll_Lock>") 'scroll-lock-mode)
 
 ;; Use ibuffer instead of the default buffer listing
 (global-set-key "\C-x\C-b" 'ibuffer)
 
 ;; * ------------------
-;; * Chinese / Mandarin language
+;; * Language
 ;; * ------------------
+
+;; Make sure the dictionary is British English
+(setq ispell-dictionary "en_GB")
+
+;; Chinese language support...
 ;;
 ;; Emacs comes with a set of input methods for a variety of languages (called Mule).
-;;
-;; Unfortunately the default Chinese input method is barely adequate if you want to actually compose text in Chinese.
-;; The best option is to just let the OS provide an input method (such as fcitx on Linux)
-;; Alternatively, the PYIM package is a substantial (but imperfect) improvement
+;; Unfortunately Mule isn't very good for Chinese character input
+;; My preference is to use an IME provided by the OS (such as fcitx on Linux)
+;; Alternatively, the PYIM works well - I have it kept here but commented out for reference
 ;;
 ;; See also:
 ;; - https://github.com/tumashu/pyim
@@ -194,16 +170,6 @@
 ;; ;; This overrides M-x toggle-input-method (C-\) to use PYIM instead of Mule.
 ;; (setq default-input-method "pyim")
 
-;; ;; Fix fonts for org-mode and elsewhere for Chinese characters
-;; ;; While this fixes some problems with fonts, it *doesn't* fix org table alignment
-;; ;; See https://github.com/chen-chao/zh-align.el
-;; (use-package zh-align
-;;   :load-path "~/emacs/zh-align.el")
-;; (use-package org
-;;   :config
-;;   (zh-align-set-faces '(org-table)))
-;; (setq zh-align-charsets '(han kana cjk-misc))
-
 ;; * ------------------
 ;; * Programming - general
 ;; * ------------------
@@ -212,7 +178,7 @@
 (auto-compression-mode t)
 (show-paren-mode t)
 
-;; Line numbers on by default (except org-mode)
+;; Keep line numbers on by default (except org-mode)
 (dolist (mode '(text-mode-hook
                 prog-mode-hook
                 conf-mode-hook))
@@ -220,55 +186,89 @@
 (dolist (mode '(org-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-;; Do follow version-controlled symlinks
+;; Automatically follow version-controlled symlinks
 (setq vc-follow-symlinks t)
 
 ;; * ------------------
 ;; * Programming - language specific
 ;; * ------------------
+
+;; We all want nice things like auto-complete, code navigation, syntax checking and linting.
 ;;
-;; We want nice things like auto-complete, code navigation, syntax checking and linting
-;; Some languages (e.g. Golang) provide good tools that can integrate easily into Emacs
-;; Some languages have good third-party tooling, for instance Scala has Metals
-;; For languages including Python and Javascript, the LSP ecosystem looks promising
-;;
-;; LSP is a protocol to enable programming languages to interoperate with IDEs and text editors.
-;; A language 'server' provides the IDE-like functionality for each language, and any IDE/editor can make use of that functionality.
-;; (See also Google Grok / Kythe, a simillar but abandonned project https://en.wikipedia.org/wiki/Google_Kythe).
-;;
-;; See https://emacs-lsp.github.io/lsp-mode
-;;     https://microsoft.github.io/language-server-protocol
+;; LSP (Language Server Protocol) enables programming languages to interoperate with IDEs and text editors.
+;; Language servers are implemented by programming language vendors. These provide all of the functionality that modern IDEs have, but expose this functionality as an API for an editor to consume.
 
-;; (use-package lsp-mode
-;;   :commands (lsp lsp-deferred)
-;;   :init
-;;   (setq lsp-keymap-prefix "C-c l")
-;;   :config)
-;; (setq lsp-ui-sideline-enable nil)
-;; (use-package flycheck
-;;   :defer t
-;;   :hook (lsp-mode . flycheck-mode))
+;; Emacs comes with its own LSP client, eglot
+;; n.b. language servers need to be installed separately
 
-;; (use-package yasnippet
-;;   :hook (prog-mode . yas-minor-mode)
-;;   :config
-;;   (yas-reload-all))
+(use-package eglot
+  :ensure t
+  :defer t
+  :hook ((python-mode . eglot-ensure))
+  :config
+  (add-to-list 'eglot-server-programs
+               `(python-mode
+                 . ,(eglot-alternatives '(("pyright-langserver" "--stdio")
+                                          "jedi-language-server"
+                                          "pylsp")))))
 
-;; ;; No documentation popups by default - use M-x lsp-ui-doc-glance / -show to view docs
-;; (setq lsp-ui-doc-enable nil)
-
-;; (use-package lsp-treemacs
-;;   :after lsp)
+(use-package company
+  :ensure t
+  :hook ((prog-mode . company-mode))
+  :bind (:map company-active-map
+              ("<return>" . nil)
+              ("RET" . nil)
+              ("C-<return>" . company-complete-selection)
+              ([tab] . company-complete-selection)
+              ("TAB" . company-complete-selection)))
+(use-package company-box
+  :ensure t
+  :hook (company-mode . company-box-mode))
 
 ;; ** Python **
-
-;; Pre-requisites: make sure a suitable LSP server is installed, for instance https://github.com/palantir/python-language-server or https://github.com/Microsoft/python-language-server
-;(add-hook 'python-mode-hook 'lsp-deferred)
 (setq python-shell-interpreter "python3")
 
-;(use-package conda
-;  :init
-;  (setq conda-env-home-directory "~/anaconda3"))
+;; This came from here: https://mclare.blog/posts/using-uv-in-emacs
+(defun uv-activate ()
+  "Activate Python environment managed by uv based on current project directory.
+Looks for .venv directory in project root and activates the Python interpreter."
+  (interactive)
+  (let* ((project-root (project-root (project-current t)))
+         (venv-path (expand-file-name ".venv" project-root))
+         (python-path (expand-file-name
+                       (if (eq system-type 'windows-nt)
+                           "Scripts/python.exe"
+                         "bin/python")
+                       venv-path)))
+    (if (file-exists-p python-path)
+        (progn
+          ;; Set Python interpreter path
+          (setq python-shell-interpreter python-path)
+
+          ;; Update exec-path to include the venv's bin directory
+          (let ((venv-bin-dir (file-name-directory python-path)))
+            (setq exec-path (cons venv-bin-dir
+                                  (remove venv-bin-dir exec-path))))
+
+          ;; Update PATH environment variable
+          (setenv "PATH" (concat (file-name-directory python-path)
+                                 path-separator
+                                 (getenv "PATH")))
+
+          ;; Update VIRTUAL_ENV environment variable
+          (setenv "VIRTUAL_ENV" venv-path)
+
+          ;; Remove PYTHONHOME if it exists
+          (setenv "PYTHONHOME" nil)
+
+          (message "Activated UV Python environment at %s" venv-path))
+      (error "No UV Python environment found in %s" project-root))))
+
+(use-package python-black
+  :ensure t
+  :demand t
+  :after python
+  :hook ((python-mode . python-black-on-save-mode)))
 
 ;; ** Go **
 
@@ -301,11 +301,6 @@
   (auto-complete-mode 1))
 (add-hook 'go-mode-hook 'auto-complete-for-go)
 
-;; ** C and C++ **
-;;(require 'cc-mode)
-;;(c-set-offset 'substatement-open 0) ;; No additional indentation for braces
-;;(c-toggle-auto-newline)
-
 ;; ** Lisp and Scheme **
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
 (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
@@ -313,31 +308,6 @@
 (add-hook 'scheme-mode-hook 'turn-on-eldoc-mode)
 
 (setq scheme-program-name "guile")
-
-;; Haskell
-;; TODO: Check current recommended approach for Haskell
-;; n.b. haskell-site-file contains all the necessary autoloads
-                                        ;(add-to-list 'load-path (my-load-path "haskell-mode"))
-;(require 'haskell-mode-autoloads)
-;(add-to-list 'Info-default-directory-list "~/emacs/haskell-mode/")
-;(define-key haskell-mode-map (kbd "C-c <") 'haskell-move-nested-left)
-;(define-key haskell-mode-map (kbd "C-c >") 'haskell-move-nested-right)
-
-;(defun haskell-custom-hook ()
-;  (turn-on-haskell-doc-mode)
-;  (turn-on-haskell-indentation))
-;(add-hook 'haskell-mode-hook 'haskell-custom-hook)
-
-;(setq haskell-program-name "ghci")
-
-;; Scala
-;; TODO look into the current favourite major mode Scala
-;; Set up Metals
-;(defun scala-custom-hook ()
-  ;; scala-mode rebinds RET to scala-newline; I wish it didn't.
-  ;; I /like/ newline-and-indent
-;  (local-set-key "\r" 'newline-and-indent))
-;(add-hook 'scala-mode-hook 'scala-custom-hook)
 
 ;; ** Prolog **
 (setq prolog-program "gprolog")
@@ -487,3 +457,19 @@
 (defun untabify-buffer ()
   (interactive)
   (untabify (point-min) (point-max)))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(color-theme-sanityinc-tomorrow corfu deft emojify ligature lsp-ui lv
+                                    magit markdown-mode pyenv-mode
+                                    python-black s spinner
+                                    twittering-mode which-key)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
