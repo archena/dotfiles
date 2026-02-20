@@ -87,6 +87,7 @@
 (require 'uniquify)
 
 ;; Set up the Tomorrow Night theme
+(use-package color-theme-sanityinc-tomorrow)
 (load-theme 'sanityinc-tomorrow-night t)
 (global-hl-line-mode t)
 
@@ -183,8 +184,11 @@
                 prog-mode-hook
                 conf-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 1))))
-(dolist (mode '(org-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+(with-eval-after-load 'org
+  (setq org-startup-indented t)
+  (add-hook 'org-mode-hook #'visual-line-mode)
+  (add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0))))
 
 ;; Automatically follow version-controlled symlinks
 (setq vc-follow-symlinks t)
