@@ -172,6 +172,22 @@
 ;; (setq default-input-method "pyim")
 
 ;; * ------------------
+;; * AI
+;; * ------------------
+(use-package gptel
+  :commands (gptel gptel-send gptel-menu)
+  :config
+  ;; Prefer environment variables / auth-source rather than hardcoding keys.
+  ;; For OpenAI: set OPENAI_API_KEY in your shell env
+  ;; For Anthropic: set ANTHROPIC_API_KEY in your shell env
+)
+
+(use-package aidermacs
+  :commands (aidermacs)
+  :config
+)
+
+;; * ------------------
 ;; * Programming - general
 ;; * ------------------
 (setq-default tab-width 4)
@@ -196,6 +212,10 @@
 ;; * ------------------
 ;; * Programming - language specific
 ;; * ------------------
+
+;; Git
+(use-package magit
+  :ensure t)
 
 ;; We all want nice things like auto-complete, code navigation, syntax checking and linting.
 ;;
@@ -286,24 +306,18 @@ Looks for .venv directory in project root and activates the Python interpreter."
 ;;    go get golang.org/x/tools/cmd/goimports
 ;;    go get -u golang.org/x/lint/golint
 
-(defun my-go-mode-hook ()
-  (require 'golint)
-  ;; Use goimports instead of go-fmt
-  (setq gofmt-command "goimports")
+;; (defun my-go-mode-hook ()
+;;   (require 'golint)
+;;   ;; Use goimports instead of go-fmt
+;;   (setq gofmt-command "goimports")
 
-  (add-hook 'before-save-hook 'gofmt-before-save)
-  (if (not (string-match "go" compile-command))
-      (set (make-local-variable 'compile-command)
-           "go build -v && go test -v && go vet"))
-  (local-set-key (kbd "M-.") 'godef-jump)
-  (local-set-key (kbd "M-*") 'pop-tag-mark))
-(add-hook 'go-mode-hook 'my-go-mode-hook)
-
-(with-eval-after-load 'go-mode
-   (require 'go-autocomplete))
-(defun auto-complete-for-go ()
-  (auto-complete-mode 1))
-(add-hook 'go-mode-hook 'auto-complete-for-go)
+;;   (add-hook 'before-save-hook 'gofmt-before-save)
+;;   (if (not (string-match "go" compile-command))
+;;       (set (make-local-variable 'compile-command)
+;;            "go build -v && go test -v && go vet"))
+;;   (local-set-key (kbd "M-.") 'godef-jump)
+;;   (local-set-key (kbd "M-*") 'pop-tag-mark))
+;; (add-hook 'go-mode-hook 'my-go-mode-hook)
 
 ;; ** Lisp and Scheme **
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
@@ -467,10 +481,9 @@ Looks for .venv directory in project root and activates the Python interpreter."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(color-theme-sanityinc-tomorrow corfu deft emojify ligature lsp-ui lv
-                                    magit markdown-mode pyenv-mode
-                                    python-black s spinner
-                                    twittering-mode which-key)))
+   '(aidermacs color-theme-sanityinc-tomorrow corfu deft emojify gptel
+               ligature lsp-ui lv magit markdown-mode pyenv-mode
+               python-black s spinner twittering-mode which-key)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
