@@ -177,9 +177,14 @@
 (use-package gptel
   :commands (gptel gptel-send gptel-menu)
   :config
-  ;; Prefer environment variables / auth-source rather than hardcoding keys.
-  ;; For OpenAI: set OPENAI_API_KEY in your shell env
-  ;; For Anthropic: set ANTHROPIC_API_KEY in your shell env
+
+  (setq gptel-model 'mistral-small:latest
+        gptel-backend (gptel-make-ollama "Ollama"
+                        :host "localhost:11434"
+                        :stream t
+                        :models '(mistral-small:latest)))
+
+  (define-key gptel-mode-map (kbd "C-<return>") #'gptel-send)
 )
 
 (use-package aidermacs
