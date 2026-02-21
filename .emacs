@@ -370,9 +370,15 @@ Looks for .venv directory in project root and activates the Python interpreter."
 
 (setq org-directory "~/docs/org/")
 
-;; Include *every* file in org agenda, and always refresh the file list before generating the agenda
-(defun refresh-org-agenda-files () (setq org-agenda-files (directory-files-recursively "~/docs/org/" "^[a-zA-Z0-9-]+\\.org$")))
-(add-hook 'org-agenda-mode-hook 'refresh-org-agenda-files)
+;; Include *every* file in org agenda (except archived), and always refresh the file list before generating the agenda
+(defun get-org-agenda-files ()
+  (setq org-agenda-files
+        (cl-remove-if
+         (lambda (file)
+           (string-match-p "~/docs/org/archived/" file))
+         (directory-files-recursively "~/docs/org/" "^[a-zA-Z0-9-]+\\.org$"))))
+
+(add-hook 'org-agenda-mode-hook 'get-org-agenda-files)
 
 ;; Keybindings and preferences
 (define-key global-map "\C-ca" 'org-agenda)
