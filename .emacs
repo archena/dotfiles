@@ -394,12 +394,6 @@ Looks for .venv directory in project root and activates the Python interpreter."
 ;; (setq org-todo-keywords
 ;;       '((sequence "TODO" "DOING" "|" "DONE")))
 
-;; Deft (experimental)
-(use-package deft)
-(setq deft-extensions '("org"))
-(setq deft-directory org-directory)
-(setq deft-recursive t)
-
 ;; (setq remember-annotation-functions '(org-remember-annotation))
 ;; (setq remember-handler-functions '(org-remember-handler))
 ;; (add-hook 'remember-mode-hook 'org-remember-apply-template)
@@ -409,6 +403,17 @@ Looks for .venv directory in project root and activates the Python interpreter."
 ;;                                ("Appointment" ?a "** TODO %^{Name} at %^{Location} %^{Time} :appointment:\n" "~/docs/org/tasks.org" "Appointments")
 ;;                                ("Remember" ?r "** TODO %^{Thing}\n" "~/docs/org/tasks.org" "Remember tasks")))
 
+
+;; * ----------------
+;; * Home automation
+;; * ----------------
+;; (use-package hass
+;;   :ensure t
+;;   :init
+;;   (setq hass-host "homeassistant.local")
+;;   (setq hass-apikey "<...> ")
+;;   (setq hass-port 8123)
+;;   )
 
 ;; * ----------------
 ;; * Mail and IM
@@ -487,7 +492,7 @@ Looks for .venv directory in project root and activates the Python interpreter."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    '(aidermacs color-theme-sanityinc-tomorrow corfu deft emojify gptel
-               ligature lsp-ui lv magit markdown-mode pyenv-mode
+               hass ligature lsp-ui lv magit markdown-mode pyenv-mode
                python-black s spinner twittering-mode which-key)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
