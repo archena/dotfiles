@@ -44,8 +44,10 @@
 
 ;; The Fira Code font just looks nice
 ;; For installation instructions, see https://github.com/tonsky/FiraCode/wiki/Linux-instructions
+;; Usually it's enough to just run sudo apt install fonts-firacode
+;;
 ;; n.b. the font height is set specifically for my machine with 4K UHD displays
-(set-face-attribute 'default nil :font "Fira Code" :height 160)
+(set-face-attribute 'default nil :font "Fira Code" :height 100)
 
 ;; Enable ligatures in programming modes if supported: https://github.com/mickeynp/ligature.el
 (unless (version< emacs-version "28.0")
@@ -497,9 +499,7 @@ Looks for .venv directory in project root and activates the Python interpreter."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(aidermacs color-theme-sanityinc-tomorrow corfu deft emojify gptel
-               hass ligature lsp-ui lv magit markdown-mode pyenv-mode
-               python-black s spinner twittering-mode which-key)))
+   '(aidermacs color-theme-sanityinc-tomorrow corfu deft emojify gptel hass ligature lsp-ui lv magit markdown-mode pyenv-mode python-black s spinner twittering-mode which-key)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
